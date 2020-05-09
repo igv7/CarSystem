@@ -35,6 +35,7 @@ public class SessionTimeout {
 						Thread.sleep(1000*60);
 					} catch (Exception e) {
 						// TODO: handle exception
+						throw new ClassCastException("You are not allowed to perform this action! ***" +e.getMessage());
 					}
 				}
 				
