@@ -42,6 +42,12 @@ public class ClientReceipt {
 //	@Field("clientName")
 	private String clientName;
 	
+//	@Field("clientPhoneNumber")
+	private String clientPhoneNumber;
+	
+//	@Field("clientEmail")
+	private String clientEmail;
+	
 //	@Field("receiptDate")
 	private String receiptDate;
 	

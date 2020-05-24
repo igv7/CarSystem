@@ -78,6 +78,8 @@ public class ClientServiceImpl implements ClientService, Facade {
 					clientReceipt.setReceiptId(ClientReceipt.incrementId());
 					clientReceipt.setClientId(client.getId());
 					clientReceipt.setClientName(client.getName());
+					clientReceipt.setClientPhoneNumber(client.getPhoneNumber());
+					clientReceipt.setClientEmail(client.getEmail());
 					clientReceipt.setReceiptDate(DateFormatter.getCurrentDate());
 					clientReceipt.setCarId(car.getId());
 					clientReceipt.setCarNumber(car.getNumber());

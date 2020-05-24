@@ -44,5 +44,8 @@ public class Car {
 	
 	@Column(name = "PRICE")
 	private double price;
+	
+	@Column(name = "IMAGE")
+	private String image;
 
 }

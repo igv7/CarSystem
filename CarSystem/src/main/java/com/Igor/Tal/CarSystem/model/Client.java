@@ -41,6 +41,9 @@ public class Client {
 	@Column(name = "PHONE")
 	private String phoneNumber;
 	
+	@Column(name = "EMAIL")
+	private String email;
+	
 	@Column(name = "BALANCE")
 	private double balance;
 	

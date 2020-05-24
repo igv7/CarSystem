@@ -63,6 +63,8 @@ public class AdminServiceImpl implements AdminService, Facade {
 //				temp.setPassword(client.getPassword());
 				temp.setAge(client.getAge());
 				temp.setPhoneNumber(client.getPhoneNumber());
+				temp.setEmail(client.getEmail());
+				temp.setBalance(client.getBalance());
 				clientRepository.save(temp);
 				System.out.println("Success to update Client: " + temp);
 				System.out.println("************************EndUpdateClient************************");
@@ -178,6 +180,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 			} else {
 				temp = optional.get();
 				temp.setPrice(car.getPrice());
+//				temp.setImage(car.getImage());
 				carRepository.save(temp);
 				System.out.println("Success to update Car: " + temp);
 				System.out.println("************************EndUpdateCar************************");
