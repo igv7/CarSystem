@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +29,7 @@ public class LoginController {
 	private CarSystem carSystem;
 	
 	
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
+	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestParam String userName, @RequestParam String password, @RequestParam String type) {
 		if (!type.equals("ADMIN") && !type.equals("CLIENT")) {
 			return new ResponseEntity<>("Wrong type", HttpStatus.UNAUTHORIZED);
