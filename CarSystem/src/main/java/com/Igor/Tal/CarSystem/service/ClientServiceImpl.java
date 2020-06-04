@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.Igor.Tal.CarSystem.exceptions.ClientDoesntExist;
 import com.Igor.Tal.CarSystem.model.Car;
 import com.Igor.Tal.CarSystem.model.Client;
 import com.Igor.Tal.CarSystem.model.ClientReceipt;
@@ -13,6 +14,7 @@ import com.Igor.Tal.CarSystem.repo.CarRepository;
 import com.Igor.Tal.CarSystem.repo.ClientReceiptRepository;
 import com.Igor.Tal.CarSystem.repo.ClientRepository;
 import com.Igor.Tal.CarSystem.utils.DateFormatter;
+
 
 
 
@@ -122,6 +124,54 @@ public class ClientServiceImpl implements ClientService, Facade {
 			throw new Exception("Failed to get all Client Receipts by date until " + receiptDate);
 		}
 
+	}
+	
+	
+	//Get Balance
+	public double getBalance() throws Exception {
+		System.out.println("************************StartGetBalance************************");
+		Client client = clientRepository.findById(clientId).get();
+		try {
+			if (client != null) {
+				double balance = client.getBalance();
+				System.out.println("Success on get balance! Client name: " + client.getName() + ", balance: " + balance);
+				System.out.println("************************EndGetBalance************************");
+				return balance;
+			}
+		} catch (Exception e) {
+			throw new Exception("Failed to get balance.");
+		}
+		return (Double) null;
+
+	}
+	
+	//Delete Account
+	public Client deleteAccount() throws Exception {
+		System.out.println("************************StartDeleteAccount************************");
+		List<Car> cars = carRepository.findAll();
+		Client temp = null;
+		try {
+			Optional<Client> optional = clientRepository.findById(clientId);
+			if (!optional.isPresent()) {
+				throw new Exception("Failed to remove Account - this Account doesn't exist ");
+			} else {
+				temp = optional.get();
+				for (Car car: temp.getCars()) {
+					car.setAmount(car.getAmount() +1);
+					carRepository.save(car);
+				}
+				carRepository.saveAll(cars);
+				temp.getCars().removeAll(cars);
+				clientRepository.deleteById(clientId);
+				System.out.println("Account removed successfully. Client id: " + clientId + " Client name: " + temp.getName());
+				System.out.println("************************EndDeleteAccount************************");
+			}
+		} catch (ClientDoesntExist e) {
+			System.err.println(e.getMessage());
+		} catch (Exception e) {
+			throw new Exception("Failed to remove Account. Client id: " + clientId);
+		}
+		return temp;
 	}
 
 

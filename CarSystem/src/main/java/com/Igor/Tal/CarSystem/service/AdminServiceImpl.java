@@ -59,9 +59,9 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Client doesn't exist");
 			} else {
 				temp = optional.get();
-//				temp.setName(client.getName());
-//				temp.setPassword(client.getPassword());
-				temp.setAge(client.getAge());
+				temp.setName(client.getName());
+				temp.setPassword(client.getPassword());
+				temp.setBirthday(client.getBirthday());
 				temp.setPhoneNumber(client.getPhoneNumber());
 				temp.setEmail(client.getEmail());
 				temp.setBalance(client.getBalance());
@@ -130,6 +130,10 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Failed to remove Client - this Client id doesn't exist: " + id);
 			} else {
 				temp = optional.get();
+				for (Car car: temp.getCars()) {
+					car.setAmount(car.getAmount() +1);
+					carRepository.save(car);
+				}
 				carRepository.saveAll(cars);
 				temp.getCars().removeAll(cars);
 				clientRepository.deleteById(id);

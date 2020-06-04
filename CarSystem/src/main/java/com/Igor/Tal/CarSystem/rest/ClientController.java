@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.Igor.Tal.CarSystem.service.ClientReceiptServiceImpl;
 import com.Igor.Tal.CarSystem.service.ClientServiceImpl;
 import com.Igor.Tal.CarSystem.task.ClientSession;
-
 
 @RestController
 @RequestMapping("/client")
@@ -32,7 +32,6 @@ public class ClientController {
 
 	@Autowired
 	private ClientReceiptServiceImpl clientReceiptServiceImpl;
-	
 
 	// Add Car
 	@PostMapping("/addCar/{token}/{id}")
@@ -68,7 +67,7 @@ public class ClientController {
 			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
 		}
 	}
-	
+
 	// View All Client Receipts By ReceiptDate (until)
 	@GetMapping("/viewAllClientReceiptsByReceiptDate/{token}/{receiptDate}")
 	public ResponseEntity<?> getAllClientReceiptsByReceiptDate(@PathVariable("token") String token,
@@ -82,6 +81,40 @@ public class ClientController {
 				e.getMessage();
 				return new ResponseEntity<>("Failed to view all Client Receipts by receiptDate!",
 						HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
+		}
+	}
+
+	// View Balance
+	@GetMapping("/viewBalance/{token}")
+	public ResponseEntity<?> getBalance(@PathVariable("token") String token) {
+		ClientSession clientSession = isActive(token);
+		if (clientSession != null) {
+			clientSession.setLastAccessed(System.currentTimeMillis());
+			try {
+				return new ResponseEntity<>(clientServiceImpl.getBalance(), HttpStatus.OK);
+			} catch (Exception e) {
+				e.getMessage();
+				return new ResponseEntity<>("Failed to view balance", HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
+		}
+	}
+
+	// Delete Account
+	@DeleteMapping("/deleteAccount/{token}")
+	public ResponseEntity<?> deleteAccount(@PathVariable("token") String token) {
+		ClientSession clientSession = isActive(token);
+		if (clientSession != null) {
+			clientSession.setLastAccessed(System.currentTimeMillis());
+			try {
+				return new ResponseEntity<>(clientServiceImpl.deleteAccount(), HttpStatus.OK);
+			} catch (Exception e) {
+				e.getMessage();
+				return new ResponseEntity<>("Failed remove account.", HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);

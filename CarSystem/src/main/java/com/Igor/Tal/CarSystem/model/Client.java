@@ -32,8 +32,8 @@ public class Client {
 	@Column(name = "NAME")
 	private String name;
 	
-	@Column(name = "AGE")
-	private int age;
+	@Column(name = "DOB")
+	private String birthday;
 	
 	@Column(name = "PASSWORD")
 	private String password;
