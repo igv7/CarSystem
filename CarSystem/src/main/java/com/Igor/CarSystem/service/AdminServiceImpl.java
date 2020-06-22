@@ -15,22 +15,17 @@ import com.Igor.CarSystem.model.Client;
 import com.Igor.CarSystem.repo.CarRepository;
 import com.Igor.CarSystem.repo.ClientRepository;
 
-
-
 @Service
 public class AdminServiceImpl implements AdminService, Facade {
-
 
 	@Autowired
 	private ClientRepository clientRepository;
 
 	@Autowired
 	private CarRepository carRepository;
-	
-
 
 	// Client Operations
-	//Create Client
+	// Create Client
 	@Override
 	public Client createClient(Client client) throws Exception {
 		System.out.println("************************StartCreateClient************************");
@@ -39,7 +34,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("This client name already exist in system, please try another name.");
 			} else {
 				clientRepository.save(client);
-				System.out.println("Success on create client: " + client.getName() + " -> " +client);
+				System.out.println("Success on create client: " + client.getName() + " -> " + client);
 				System.out.println("************************EndCreateClient************************");
 			}
 		} catch (Exception e) {
@@ -48,7 +43,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return client;
 	}
 
-	//Update Client
+	// Update Client
 	@Override
 	public Client updateClient(Client client) throws Exception {
 		System.out.println("************************StartUpdateClient************************");
@@ -76,7 +71,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	//Get Client By Id
+	// Get Client By Id
 	@Override
 	public Client getClientById(int id) throws Exception {
 		System.out.println("************************StartGetClientById************************");
@@ -87,7 +82,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Failed to get client - this client id doesn't exist: " + id);
 			} else {
 				temp = optional.get();
-				System.out.println("Success on get Client: "+temp);
+				System.out.println("Success on get Client: " + temp);
 				System.out.println("************************EndGetClientById************************");
 			}
 		} catch (ClientDoesntExist e) {
@@ -98,7 +93,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return temp;
 	}
 
-	//Get All Clients
+	// Get All Clients
 	@Override
 	public List<Client> getAllClients() throws Exception {
 		System.out.println("************************StartGetAllClientsById************************");
@@ -108,7 +103,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Cannot get all clients. The list is empty!");
 			} else {
 				clients = clientRepository.findAll();
-				System.out.println("Success on get All Clients: "+clients);
+				System.out.println("Success on get All Clients: " + clients);
 				System.out.println("************************EndGetAllClientsById************************");
 				return clients;
 			}
@@ -118,7 +113,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	//Delete Client
+	// Delete Client
 	@Override
 	public Client deleteClient(int id) throws Exception {
 		System.out.println("************************StartDeleteClient************************");
@@ -130,8 +125,8 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Failed to remove Client - this Client id doesn't exist: " + id);
 			} else {
 				temp = optional.get();
-				for (Car car: temp.getCars()) {
-					car.setAmount(car.getAmount() +1);
+				for (Car car : temp.getCars()) {
+					car.setAmount(car.getAmount() + 1);
 					carRepository.save(car);
 				}
 				carRepository.saveAll(cars);
@@ -149,12 +144,10 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	//**************************************************************************************************************
-	
-	
-	
+	// **************************************************************************************************************
+
 	// Car Operations
-	//Create Car
+	// Create Car
 	@Override
 	public Car createCar(Car car) throws Exception {
 		System.out.println("************************StartCreateCar************************");
@@ -172,7 +165,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return car;
 	}
 
-	//Update Car
+	// Update Car
 	@Override
 	public Car updateCar(Car car) throws Exception {
 		System.out.println("************************StartUpdateCar************************");
@@ -183,8 +176,12 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Car doesn't exist");
 			} else {
 				temp = optional.get();
+				temp.setNumber(car.getNumber());
+				temp.setColor(car.getColor());
+				temp.setType(car.getType());
+				temp.setAmount(car.getAmount());
 				temp.setPrice(car.getPrice());
-//				temp.setImage(car.getImage());
+				temp.setImage(car.getImage());
 				carRepository.save(temp);
 				System.out.println("Success to update Car: " + temp);
 				System.out.println("************************EndUpdateCar************************");
@@ -196,7 +193,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	//Get Car By Id
+	// Get Car By Id
 	@Override
 	public Car getCarById(int id) throws Exception {
 		System.out.println("************************StartGetCarById************************");
@@ -207,7 +204,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Failed to get car - this car id doesn't exist: " + id);
 			} else {
 				temp = optional.get();
-				System.out.println("Success on get Car by id " +id+ ": " +temp);
+				System.out.println("Success on get Car by id " + id + ": " + temp);
 				System.out.println("************************EndGetCarById************************");
 			}
 		} catch (CarDoesntExist e) {
@@ -218,7 +215,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return temp;
 	}
 
-	//Get Car By CarNumber
+	// Get Car By CarNumber
 	@Override
 	public Car getCarByNumber(String number) throws Exception {
 		System.out.println("************************StartGetCarByNumber************************");
@@ -229,7 +226,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Failed to get car - this car number doesn't exist: " + number);
 			} else {
 				temp = optional.get();
-				System.out.println("Success on get Car by number " +number+ ": " +temp);
+				System.out.println("Success on get Car by number " + number + ": " + temp);
 				System.out.println("************************EndGetCarByNumber************************");
 			}
 		} catch (CarDoesntExist e) {
@@ -240,7 +237,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return temp;
 	}
 
-	//Get All Cars
+	// Get All Cars
 	@Override
 	public List<Car> getAllCars() throws Exception {
 		System.out.println("************************StartGetAllCars************************");
@@ -250,7 +247,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Cannot get all cars. The list is empty!");
 			} else {
 				cars = carRepository.findAll();
-				System.out.println("Success on get all Cars: " +cars);
+				System.out.println("Success on get all Cars: " + cars);
 				System.out.println("************************EndGetAllCars************************");
 				return cars;
 			}
@@ -260,7 +257,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	//Delete Car
+	// Delete Car
 	@Override
 	public Car deleteCar(int id) throws Exception {
 		System.out.println("************************StartDeleteCar************************");
@@ -298,7 +295,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Cannot get all cars. The list is empty!");
 			} else {
 				cars = carRepository.findAllByType(type);
-				System.out.println("Success on get all Cars by type " +type+ ": " +cars);
+				System.out.println("Success on get all Cars by type " + type + ": " + cars);
 				System.out.println("************************EndGetAllCarsByType************************");
 				return cars;
 			}
@@ -317,7 +314,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Cannot get all cars. The list is empty!");
 			} else {
 				cars = carRepository.findAllByColor(color);
-				System.out.println("Success on get all Cars by color " +color+ ": " +cars);
+				System.out.println("Success on get all Cars by color " + color + ": " + cars);
 				System.out.println("************************EndGetAllCarsByColor************************");
 				return cars;
 			}
@@ -342,15 +339,37 @@ public class AdminServiceImpl implements AdminService, Facade {
 			} else {
 				temp = optional.get();
 				System.out.println("Success on get Client Car by number. Client name: " + client.getName()
-				+ ", car number: " + number + ": " + temp);
+						+ ", car number: " + number + ": " + temp);
 				System.out.println("************************EndGetClientCarByNumber************************");
 			}
 		} catch (CarDoesntExist e) {
-			System.err.println(e.getMessage());;
+			System.err.println(e.getMessage());
+			;
 		} catch (Exception e) {
 			throw new Exception("Failed to get car: " + number);
 		}
 		return temp;
+	}
+
+	// Get All Client Cars
+	public List<Car> getAllClientCars(int clientId) throws Exception {
+		System.out.println("************************StartGetAllClientCars************************");
+		Client client = clientRepository.findById(clientId).get();
+		List<Car> cars = null;
+		try {
+			if (client.getCars().isEmpty()) {
+				throw new Exception("Admin failed to get all " + client.getName() + "'s cars. Cars do not exist.");
+			} else {
+				cars = carRepository.findClientCar(client.getId());
+				System.out.println(
+						"Success on get all Client Cars. Client name: " + client.getName() + ", cars: " + cars);
+				System.out.println("************************EndGetAllClientCars************************");
+				return cars;
+			}
+		} catch (Exception e) {
+			throw new Exception("Admin failed to get all client cars: " + cars);
+		}
+
 	}
 
 	// Get All Client Cars By CarType
@@ -365,7 +384,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 			} else {
 				cars = carRepository.findClientCarByType(client.getId(), type);
 				System.out.println("Success on get all Client Cars by type. Client name: " + client.getName()
-				+ ", car type: " + type + ": " + cars);
+						+ ", car type: " + type + ": " + cars);
 				System.out.println("************************EndGetAllClientCarsByType************************");
 				return cars;
 			}
@@ -387,7 +406,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 			} else {
 				cars = carRepository.findClientCarByColor(client.getId(), color);
 				System.out.println("Success on get all Client Cars by color. Client name: " + client.getName()
-				+ ", car color: " + color + ": " + cars);
+						+ ", car color: " + color + ": " + cars);
 				System.out.println("************************EndGetAllClientCarsByColor************************");
 				return cars;
 			}
@@ -409,7 +428,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 			} else {
 				cars = carRepository.findClientCarByPrice(client.getId(), price);
 				System.out.println("Success on get all Client Cars by price. Client name: " + client.getName()
-				+ ", car price until: " + price + ": " + cars);
+						+ ", car price until: " + price + ": " + cars);
 				System.out.println("************************EndGetAllClientCarsByPrice************************");
 				return cars;
 			}
@@ -418,6 +437,5 @@ public class AdminServiceImpl implements AdminService, Facade {
 		}
 
 	}
-
 
 }

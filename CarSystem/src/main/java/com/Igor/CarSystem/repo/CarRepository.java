@@ -27,6 +27,9 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
 	@Query("SELECT c from Client as client join client.cars As c WHERE client.id=:id AND c.number=:number")
 	public Car findClientCarByNumber(int id, String number);
 	
+	@Query("SELECT c from Client as client join client.cars As c WHERE client.id=:id")
+	public List<Car> findClientCar(int id);
+	
 	@Query("SELECT c from Client as client join client.cars As c WHERE client.id=:id AND c.type=:type")
 	public List<Car> findClientCarByType(int id, CarType type);
 	

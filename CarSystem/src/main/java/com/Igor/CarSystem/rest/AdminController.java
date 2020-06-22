@@ -22,7 +22,6 @@ import com.Igor.CarSystem.service.AdminServiceImpl;
 import com.Igor.CarSystem.service.ClientReceiptServiceImpl;
 import com.Igor.CarSystem.task.ClientSession;
 
-
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -39,7 +38,6 @@ public class AdminController {
 
 	@Autowired
 	private ClientReceiptServiceImpl clientReceiptServiceImpl;
-
 
 	// Client Operations
 	// Add Client
@@ -127,10 +125,9 @@ public class AdminController {
 			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
 		}
 	}
-	
-	//******************************************************************************************************************
 
-	
+	// ******************************************************************************************************************
+
 	// Car Operations
 	// Add Car
 	@PostMapping("/addCar/{token}")
@@ -290,6 +287,23 @@ public class AdminController {
 		}
 	}
 
+	// View All Client Cars
+	@GetMapping("/viewAllClientCars/{token}/{id}")
+	public ResponseEntity<?> getAllClientCars(@PathVariable("token") String token, @PathVariable("id") int id) {
+		ClientSession clientSession = isActive(token);
+		if (clientSession != null) {
+			clientSession.setLastAccessed(System.currentTimeMillis());
+			try {
+				return new ResponseEntity<>(adminServiceImpl.getAllClientCars(id), HttpStatus.OK);
+			} catch (Exception e) {
+				e.getMessage();
+				return new ResponseEntity<>("Failed to view all Client cars by admin", HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
+		}
+	}
+
 	// View All Client Cars By CarType
 	@GetMapping("/viewAllClientCarsByType/{token}/{id}/{type}")
 	public ResponseEntity<?> getAllClientCarsByType(@PathVariable("token") String token, @PathVariable("id") int id,
@@ -343,18 +357,18 @@ public class AdminController {
 			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
 		}
 	}
-	
-	
-	//Receipts********************************************************************************************************
+
+	// Receipts********************************************************************************************************
 	// View All Client Receipts By ReceiptDate (until)
 	@GetMapping("/viewAllClientReceiptsByReceiptDate/{token}/{id}/{receiptDate}")
-	public ResponseEntity<?> getAllClientReceiptsByReceiptDate(@PathVariable("token") String token, @PathVariable("id") int id,
-			@PathVariable("receiptDate") String receiptDate) { //Date receiptDate
+	public ResponseEntity<?> getAllClientReceiptsByReceiptDate(@PathVariable("token") String token,
+			@PathVariable("id") int id, @PathVariable("receiptDate") String receiptDate) { // Date receiptDate
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
 			try {
-				return new ResponseEntity<>(clientReceiptServiceImpl.getAllClientReceiptsByDate(id, receiptDate), HttpStatus.OK);
+				return new ResponseEntity<>(clientReceiptServiceImpl.getAllClientReceiptsByDate(id, receiptDate),
+						HttpStatus.OK);
 			} catch (Exception e) {
 				e.getMessage();
 				return new ResponseEntity<>("Failed to view all Client Receipts by receiptDate by admin",
