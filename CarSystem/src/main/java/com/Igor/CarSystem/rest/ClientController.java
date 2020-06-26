@@ -51,6 +51,40 @@ public class ClientController {
 		}
 	}
 
+	// View Cars
+	@GetMapping("/viewCars/{token}")
+	public ResponseEntity<?> getCars(@PathVariable String token) {
+		ClientSession clientSession = isActive(token);
+		if (clientSession != null) {
+			clientSession.setLastAccessed(System.currentTimeMillis());
+			try {
+				return new ResponseEntity<>(clientServiceImpl.getCars(), HttpStatus.OK);
+			} catch (Exception e) {
+				e.getMessage();
+				return new ResponseEntity<>("Failed to view cars by client", HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
+		}
+	}
+
+	// View My Cars
+	@GetMapping("/viewMyCars/{token}")
+	public ResponseEntity<?> getMyCars(@PathVariable String token) {
+		ClientSession clientSession = isActive(token);
+		if (clientSession != null) {
+			clientSession.setLastAccessed(System.currentTimeMillis());
+			try {
+				return new ResponseEntity<>(clientServiceImpl.getMyCars(), HttpStatus.OK);
+			} catch (Exception e) {
+				e.getMessage();
+				return new ResponseEntity<>("Failed to view my cars", HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
+		}
+	}
+
 	// View Receipts By Client
 	@GetMapping("/viewReceiptsByClient/{token}/{id}")
 	public ResponseEntity<?> getReceiptsByClient(@PathVariable("token") String token, @PathVariable("id") int id) {

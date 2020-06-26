@@ -15,9 +15,6 @@ import com.Igor.CarSystem.repo.ClientReceiptRepository;
 import com.Igor.CarSystem.repo.ClientRepository;
 import com.Igor.CarSystem.utils.DateFormatter;
 
-
-
-
 @Service
 public class ClientServiceImpl implements ClientService, Facade {
 
@@ -40,7 +37,6 @@ public class ClientServiceImpl implements ClientService, Facade {
 		this.clientId = clientId;
 	}
 
-
 	// Add Car
 	@Override
 	public Car getCar(int id) throws Exception {
@@ -61,7 +57,7 @@ public class ClientServiceImpl implements ClientService, Facade {
 				throw new Exception("Client failed to get car - wrong amount: " + car.getAmount());
 			}
 
-			System.out.println("(client.getCars().contains(car)) = " +(client.getCars().contains(car)));
+			System.out.println("(client.getCars().contains(car)) = " + (client.getCars().contains(car)));
 			if (client.getCars().contains(car)) {
 				throw new Exception(
 						"Client " + client.getName() + " unable to get car id: " + id + " - already got same car. ");
@@ -104,7 +100,45 @@ public class ClientServiceImpl implements ClientService, Facade {
 		return null;
 	}
 
-	
+	// Get Cars
+	@Override
+	public List<Car> getCars() throws Exception {
+		System.out.println("************************StartGetCars************************");
+		List<Car> cars = null;
+		try {
+			if (carRepository.findAll().isEmpty()) {
+				throw new Exception("Cannot get cars. The list is empty!");
+			} else {
+				cars = carRepository.findAll();
+				System.out.println("Success on get Cars: " + cars);
+				System.out.println("************************EndGetCars************************");
+				return cars;
+			}
+		} catch (Exception e) {
+			throw new Exception("Failed to get all cars");
+		}
+	}
+
+	// Get My Cars
+	public List<Car> getMyCars() throws Exception {
+		System.out.println("************************StartGetMyCars************************");
+		Client client = clientRepository.findById(clientId).get();
+		List<Car> myCars = null;
+		try {
+			if (carRepository.findClientCar(client.getId()).isEmpty()) {
+				throw new Exception("Failed to get My Cars. Client name: " + client.getName() + ", Cars: " + myCars + " Data is empty.");
+			} else {
+				myCars = carRepository.findClientCar(client.getId());
+				System.out.println("Success on get My Cars. Client name: " + client.getName() + ", Cars: " + myCars);
+				System.out.println("************************EndGetGetMyCars************************");
+				return myCars;
+			}
+		} catch (Exception e) {
+			throw new Exception("Failed to get all My Cars " + myCars);
+		}
+
+	}
+
 	// Get All Client Receipts By ReceiptDate (until)
 	public List<ClientReceipt> getAllClientReceiptsByDate(String receiptDate) throws Exception {
 		System.out.println("************************StartGetAllClientReceiptsByDate************************");
@@ -114,9 +148,10 @@ public class ClientServiceImpl implements ClientService, Facade {
 			if (clientReceiptRepository.findAllByClientId(client.getId()).isEmpty()) {
 				throw new Exception("Failed to get all " + client.getName() + " receipts! Data is empty.");
 			} else {
-				receiptsByDate = clientReceiptRepository.findAllByClientIdAndReceiptDateLessThanEqual(client.getId(), receiptDate);
-				System.out.println("Success on get all Client Receipts by receipt date. Client name: " + client.getName()
-						+ ", receipt date until: " + receiptDate + ": " + receiptsByDate);
+				receiptsByDate = clientReceiptRepository.findAllByClientIdAndReceiptDateLessThanEqual(client.getId(),
+						receiptDate);
+				System.out.println("Success on get all Client Receipts by receipt date. Client name: "
+						+ client.getName() + ", receipt date until: " + receiptDate + ": " + receiptsByDate);
 				System.out.println("************************EndGetAllClientReceiptsByDate************************");
 				return receiptsByDate;
 			}
@@ -125,16 +160,16 @@ public class ClientServiceImpl implements ClientService, Facade {
 		}
 
 	}
-	
-	
-	//Get Balance
+
+	// Get Balance
 	public double getBalance() throws Exception {
 		System.out.println("************************StartGetBalance************************");
 		Client client = clientRepository.findById(clientId).get();
 		try {
 			if (client != null) {
 				double balance = client.getBalance();
-				System.out.println("Success on get balance! Client name: " + client.getName() + ", balance: " + balance);
+				System.out
+						.println("Success on get balance! Client name: " + client.getName() + ", balance: " + balance);
 				System.out.println("************************EndGetBalance************************");
 				return balance;
 			}
@@ -144,8 +179,8 @@ public class ClientServiceImpl implements ClientService, Facade {
 		return (Double) null;
 
 	}
-	
-	//Delete Account
+
+	// Delete Account
 	public Client deleteAccount() throws Exception {
 		System.out.println("************************StartDeleteAccount************************");
 		List<Car> cars = carRepository.findAll();
@@ -156,14 +191,15 @@ public class ClientServiceImpl implements ClientService, Facade {
 				throw new Exception("Failed to remove Account - this Account doesn't exist ");
 			} else {
 				temp = optional.get();
-				for (Car car: temp.getCars()) {
-					car.setAmount(car.getAmount() +1);
+				for (Car car : temp.getCars()) {
+					car.setAmount(car.getAmount() + 1);
 					carRepository.save(car);
 				}
 				carRepository.saveAll(cars);
 				temp.getCars().removeAll(cars);
 				clientRepository.deleteById(clientId);
-				System.out.println("Account removed successfully. Client id: " + clientId + " Client name: " + temp.getName());
+				System.out.println(
+						"Account removed successfully. Client id: " + clientId + " Client name: " + temp.getName());
 				System.out.println("************************EndDeleteAccount************************");
 			}
 		} catch (ClientDoesntExist e) {
@@ -173,6 +209,5 @@ public class ClientServiceImpl implements ClientService, Facade {
 		}
 		return temp;
 	}
-
 
 }
