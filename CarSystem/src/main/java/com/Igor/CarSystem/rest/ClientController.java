@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Igor.CarSystem.service.ClientReceiptServiceImpl;
 import com.Igor.CarSystem.service.ClientServiceImpl;
 import com.Igor.CarSystem.task.ClientSession;
 
@@ -30,8 +29,6 @@ public class ClientController {
 	@Autowired
 	private ClientServiceImpl clientServiceImpl;
 
-	@Autowired
-	private ClientReceiptServiceImpl clientReceiptServiceImpl;
 
 	// Add Car
 	@PostMapping("/addCar/{token}/{id}")
@@ -103,16 +100,16 @@ public class ClientController {
 	}
 
 	// View Receipts By Client
-	@GetMapping("/viewReceiptsByClient/{token}/{id}")
-	public ResponseEntity<?> getReceiptsByClient(@PathVariable("token") String token, @PathVariable("id") int id) {
+	@GetMapping("/viewMyReceipts/{token}")
+	public ResponseEntity<?> getReceiptsByClient(@PathVariable("token") String token) {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
 			try {
-				return new ResponseEntity<>(clientReceiptServiceImpl.getReceiptsByClient(id), HttpStatus.OK);
+				return new ResponseEntity<>(clientServiceImpl.getReceiptsByClient(), HttpStatus.OK);
 			} catch (Exception e) {
 				e.getMessage();
-				return new ResponseEntity<>("Failed to view Receipts By Client id: " + id, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>("Failed to view Receipts By Client. ", HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
@@ -120,7 +117,7 @@ public class ClientController {
 	}
 
 	// View All Client Receipts By ReceiptDate (until)
-	@GetMapping("/viewAllClientReceiptsByReceiptDate/{token}/{receiptDate}")
+	@GetMapping("/viewAllReceiptsByDate/{token}/{receiptDate}")
 	public ResponseEntity<?> getAllClientReceiptsByReceiptDate(@PathVariable("token") String token,
 			@PathVariable("receiptDate") String receiptDate) {
 		ClientSession clientSession = isActive(token);

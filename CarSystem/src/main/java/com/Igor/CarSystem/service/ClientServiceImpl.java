@@ -167,6 +167,25 @@ public class ClientServiceImpl implements ClientService, Facade {
 
 	}
 
+	// Get Receipts By Client
+	public List<ClientReceipt> getReceiptsByClient() throws Exception {
+		System.out.println("************************StartGetReceiptsByClient************************");
+		Client client = clientRepository.findById(clientId).get();
+		List<ClientReceipt> receiptsByClient = null;
+		try {
+			if (clientReceiptRepository.findAllByClientId(client.getId()).isEmpty()) {
+				throw new Exception("Failed to get all receipts by client! Data is empty.");
+			} else {
+				receiptsByClient = clientReceiptRepository.findAllByClientId(client.getId());
+				System.out.println("Success on get receipts by Client " + client.getName() + ": " + receiptsByClient);
+				System.out.println("************************EndGetReceiptsByClient************************");
+				return receiptsByClient;
+			}
+		} catch (Exception e) {
+			throw new Exception("Failed to get all receipts by client " + e.getMessage());
+		}
+	}
+
 	// Get All Client Receipts By ReceiptDate (until)
 	public List<ClientReceipt> getAllClientReceiptsByDate(String receiptDate) throws Exception {
 		System.out.println("************************StartGetAllClientReceiptsByDate************************");
