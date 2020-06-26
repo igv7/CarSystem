@@ -35,7 +35,7 @@ public class ClientController {
 
 	// Add Car
 	@PostMapping("/addCar/{token}/{id}")
-	public ResponseEntity<?> getCar(@PathVariable("token") String token, @PathVariable int id) {
+	public ResponseEntity<?> getCar(@PathVariable("token") String token, @PathVariable("id") int id) {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
@@ -53,7 +53,7 @@ public class ClientController {
 
 	// View Cars
 	@GetMapping("/viewCars/{token}")
-	public ResponseEntity<?> getCars(@PathVariable String token) {
+	public ResponseEntity<?> getCars(@PathVariable("token") String token) {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
@@ -70,7 +70,7 @@ public class ClientController {
 
 	// View My Cars
 	@GetMapping("/viewMyCars/{token}")
-	public ResponseEntity<?> getMyCars(@PathVariable String token) {
+	public ResponseEntity<?> getMyCars(@PathVariable("token") String token) {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
@@ -79,6 +79,23 @@ public class ClientController {
 			} catch (Exception e) {
 				e.getMessage();
 				return new ResponseEntity<>("Failed to view my cars", HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
+		}
+	}
+
+	// Return Car
+	@DeleteMapping("/returnCar/{token}/{id}")
+	public ResponseEntity<?> returnCar(@PathVariable("token") String token, @PathVariable("id") int id) {
+		ClientSession clientSession = isActive(token);
+		if (clientSession != null) {
+			clientSession.setLastAccessed(System.currentTimeMillis());
+			try {
+				return new ResponseEntity<>(clientServiceImpl.returnCar(id), HttpStatus.OK);
+			} catch (Exception e) {
+				e.getMessage();
+				return new ResponseEntity<>("Failed to return car", HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);

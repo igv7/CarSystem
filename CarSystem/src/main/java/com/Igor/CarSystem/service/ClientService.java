@@ -11,5 +11,7 @@ public interface ClientService {
 	public Car getCar(int id) throws Exception;
 	
 	public List<Car> getCars() throws Exception;
+	
+	public Car returnCar(int id) throws Exception;
 
 }

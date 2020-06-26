@@ -126,15 +126,43 @@ public class ClientServiceImpl implements ClientService, Facade {
 		List<Car> myCars = null;
 		try {
 			if (carRepository.findClientCar(client.getId()).isEmpty()) {
-				throw new Exception("Failed to get My Cars. Client name: " + client.getName() + ", Cars: " + myCars + " Data is empty.");
+				throw new Exception("Failed to get My Cars. Client name: " + client.getName() + ", Cars: " + myCars
+						+ " Data is empty.");
 			} else {
 				myCars = carRepository.findClientCar(client.getId());
 				System.out.println("Success on get My Cars. Client name: " + client.getName() + ", Cars: " + myCars);
-				System.out.println("************************EndGetGetMyCars************************");
+				System.out.println("************************EndGetMyCars************************");
 				return myCars;
 			}
 		} catch (Exception e) {
 			throw new Exception("Failed to get all My Cars " + myCars);
+		}
+
+	}
+
+	// Return Car
+	@Override
+	public Car returnCar(int id) throws Exception {
+		System.out.println("************************StartReturnCar************************");
+		List<Car> cars = carRepository.findAll();
+		Client client = clientRepository.findById(clientId).get();
+		Car car = null;
+		try {
+			if (carRepository.findClientCar(client.getId()).isEmpty()) {
+				throw new Exception("Failed to get all " + client.getName() + " cars! Data is empty.");
+			} else {
+				car = carRepository.getOne(id);
+				car.setAmount(car.getAmount() + 1);
+				carRepository.save(car);
+				carRepository.saveAll(cars);
+				client.getCars().remove(car);
+				clientRepository.save(client);
+				System.out.println("Success on return Car. Client name: " + client.getName() + ", Car: " + car);
+				System.out.println("************************EndReturnCar************************");
+				return car;
+			}
+		} catch (Exception e) {
+			throw new Exception("Failed to return Car " + car);
 		}
 
 	}
