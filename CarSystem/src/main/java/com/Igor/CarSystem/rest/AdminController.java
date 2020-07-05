@@ -359,26 +359,6 @@ public class AdminController {
 	}
 
 	// Receipts********************************************************************************************************
-	// View All Client Receipts By ReceiptDate (until)
-	@GetMapping("/viewAllClientReceiptsByReceiptDate/{token}/{id}/{receiptDate}")
-	public ResponseEntity<?> getAllClientReceiptsByReceiptDate(@PathVariable("token") String token,
-			@PathVariable("id") int id, @PathVariable("receiptDate") String receiptDate) { // Date receiptDate
-		ClientSession clientSession = isActive(token);
-		if (clientSession != null) {
-			clientSession.setLastAccessed(System.currentTimeMillis());
-			try {
-				return new ResponseEntity<>(clientReceiptServiceImpl.getAllClientReceiptsByDate(id, receiptDate),
-						HttpStatus.OK);
-			} catch (Exception e) {
-				e.getMessage();
-				return new ResponseEntity<>("Failed to view all Client Receipts by receiptDate by admin",
-						HttpStatus.BAD_REQUEST);
-			}
-		} else {
-			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
-		}
-	}
-
 	// View Receipts By Client
 	@GetMapping("/viewReceiptsByClient/{token}/{id}")
 	public ResponseEntity<?> getReceiptsByClient(@PathVariable("token") String token, @PathVariable("id") int id) {

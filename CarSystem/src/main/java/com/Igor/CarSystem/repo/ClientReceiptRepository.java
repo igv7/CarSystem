@@ -15,7 +15,5 @@ public interface ClientReceiptRepository extends MongoRepository<ClientReceipt, 
 	public ClientReceipt findByClientId(int clientId);
 
 	public List<ClientReceipt> findAllByClientId(int clientId);
-	
-	public List<ClientReceipt> findAllByClientIdAndReceiptDateLessThanEqual(int clientId, String receiptDate);
 
 }

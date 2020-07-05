@@ -116,25 +116,6 @@ public class ClientController {
 		}
 	}
 
-	// View All Client Receipts By ReceiptDate (until)
-	@GetMapping("/viewAllReceiptsByDate/{token}/{receiptDate}")
-	public ResponseEntity<?> getAllClientReceiptsByReceiptDate(@PathVariable("token") String token,
-			@PathVariable("receiptDate") String receiptDate) {
-		ClientSession clientSession = isActive(token);
-		if (clientSession != null) {
-			clientSession.setLastAccessed(System.currentTimeMillis());
-			try {
-				return new ResponseEntity<>(clientServiceImpl.getAllClientReceiptsByDate(receiptDate), HttpStatus.OK);
-			} catch (Exception e) {
-				e.getMessage();
-				return new ResponseEntity<>("Failed to view all Client Receipts by receiptDate!",
-						HttpStatus.BAD_REQUEST);
-			}
-		} else {
-			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
-		}
-	}
-
 	// View Balance
 	@GetMapping("/viewBalance/{token}")
 	public ResponseEntity<?> getBalance(@PathVariable("token") String token) {

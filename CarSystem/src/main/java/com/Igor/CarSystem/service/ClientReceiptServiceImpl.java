@@ -75,26 +75,5 @@ public class ClientReceiptServiceImpl implements ClientReceiptService, Facade {
 		}
 	}
 
-	// Get All Client Receipts By ReceiptDate (until)
-	public List<ClientReceipt> getAllClientReceiptsByDate(int clientId, String receiptDate) throws Exception {	
-		System.out.println("************************StartGetAllClientReceiptsByDate************************");
-		Client client = clientRepository.findById(clientId).get();
-		List<ClientReceipt> receiptsByDate = null;
-		try {
-			if (clientReceiptRepository.findAllByClientId(client.getId()).isEmpty()) {
-				throw new Exception("Admin failed to get all " + client.getName() + " receipts! Data is empty.");
-			} else {
-
-				receiptsByDate = clientReceiptRepository.findAllByClientIdAndReceiptDateLessThanEqual(client.getId(), receiptDate);
-				System.out.println("Success on get all Client Receipts by receipt date. Client name: "
-						+ client.getName() + ", receipt date until: " + receiptDate + ": " + receiptsByDate);
-				System.out.println("************************EndGetAllClientReceiptsByDate************************");
-				return receiptsByDate;
-			}
-		} catch (Exception e) {
-			throw new Exception("Admin failed to get all Client Receipts by date until " + receiptDate);
-		}
-
-	}
 
 }
