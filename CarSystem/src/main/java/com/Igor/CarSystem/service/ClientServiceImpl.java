@@ -189,20 +189,23 @@ public class ClientServiceImpl implements ClientService, Facade {
 	// Get Balance
 	public double getBalance() throws Exception {
 		System.out.println("************************StartGetBalance************************");
-		Client client = clientRepository.findById(clientId).get();
+		Client temp = null;
 		try {
-			if (client != null) {
-				double balance = client.getBalance();
-				System.out
-						.println("Success on get balance! Client name: " + client.getName() + ", balance: " + balance);
+			Optional<Client> optional = clientRepository.findById(clientId);
+			if (!optional.isPresent()) {
+				throw new Exception("Failed to get client - this client id doesn't exist: " + clientId);
+			} else {
+				temp = optional.get();
+				System.out.println("Success on get Client: " + temp);
+				System.out.println("Client balance: " + temp.getBalance());
 				System.out.println("************************EndGetBalance************************");
-				return balance;
 			}
+		} catch (ClientDoesntExist e) {
+			System.err.println(e.getMessage());
 		} catch (Exception e) {
-			throw new Exception("Failed to get balance.");
+			throw new Exception("Failed to get client - this client id doesn't exist: " + clientId);
 		}
-		return (Double) null;
-
+		return temp.getBalance();
 	}
 
 	// Delete Account
