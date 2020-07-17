@@ -233,6 +233,23 @@ public class AdminController {
 		}
 	}
 
+	// Return Car
+	@DeleteMapping("/returnCar/{token}/{id}")
+	public ResponseEntity<?> returnCar(@PathVariable("token") String token, @PathVariable("id") int id) {
+		ClientSession clientSession = isActive(token);
+		if (clientSession != null) {
+			clientSession.setLastAccessed(System.currentTimeMillis());
+			try {
+				return new ResponseEntity<>(adminServiceImpl.returnCar(id), HttpStatus.OK);
+			} catch (Exception e) {
+				e.getMessage();
+				return new ResponseEntity<>("Failed to return car by admin", HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
+		}
+	}
+
 	// View all Cars By CarType
 	@GetMapping("/viewAllCarsByCarType/{token}/{type}")
 	public ResponseEntity<?> getAllCarsByCarType(@PathVariable("token") String token,

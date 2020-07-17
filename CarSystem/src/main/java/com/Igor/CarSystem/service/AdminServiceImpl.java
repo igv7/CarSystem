@@ -286,6 +286,35 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
+	// Return Car
+	public Car returnCar(int id) throws Exception {
+		System.out.println("************************StartReturnCar************************");
+		Client client = clientRepository.findClientByCar(id);
+		Car temp = null;
+		try {
+			Optional<Car> optional = carRepository.findById(id);
+			if (!optional.isPresent()) {
+				throw new Exception("Failed to return Car - this Car id doesn't exist: " + id);
+			} else {
+				temp = optional.get();
+				if (client != null) {
+					temp.setAmount(temp.getAmount() + 1);
+					carRepository.save(temp);
+					client.getCars().remove(temp);
+					clientRepository.save(client);
+				}
+				System.out.println("Car returned successfully. Car id: " + id + " Car number: " + temp.getNumber());
+				System.out.println("************************EndReturnCar************************");
+			}
+		} catch (CarDoesntExist e) {
+			System.err.println(e.getMessage());
+		} catch (Exception e) {
+			throw new Exception("Failed to return Car. Car id: " + id);
+		}
+		return temp;
+
+	}
+
 	// Get all Cars By CarType
 	public List<Car> getAllCarsByType(CarType type) throws Exception {
 		System.out.println("************************StartGetAllCarsByType************************");

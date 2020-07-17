@@ -48,6 +48,9 @@ public class ClientReceipt {
 //	@Field("clientEmail")
 	private String clientEmail;
 	
+//	@Field("clientBalance")
+	private double clientBalance;
+	
 //	@Field("receiptDate")
 	private String receiptDate;
 	
