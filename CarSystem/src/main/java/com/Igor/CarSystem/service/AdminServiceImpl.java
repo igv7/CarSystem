@@ -33,8 +33,11 @@ public class AdminServiceImpl implements AdminService, Facade {
 			if (clientRepository.existsByName(client.getName())) {
 				throw new Exception("This client name already exist in system, please try another name.");
 			} else {
-				clientRepository.save(client);
-				System.out.println("Success on create client: " + client.getName() + " -> " + client);
+				if (client.getName() != null && client.getBirthday() != null && client.getPassword() != null
+						&& client.getPhoneNumber() != null && client.getEmail() != null) {
+					clientRepository.save(client);
+					System.out.println("Success on create client: " + client.getName() + " -> " + client);
+				}
 				System.out.println("************************EndCreateClient************************");
 			}
 		} catch (Exception e) {
@@ -155,8 +158,11 @@ public class AdminServiceImpl implements AdminService, Facade {
 			if (carRepository.existsByNumber(car.getNumber())) {
 				throw new Exception("This car number already exist in system, please try another number.");
 			} else {
-				carRepository.save(car);
-				System.out.println("Success on create car. Car number: " + car.getNumber() + " -> " + car);
+				if (car.getNumber() != null && car.getColor() != null && car.getType() != null && car.getAmount() != 0
+						&& car.getPrice() != 0 && car.getImage() != null) {
+					carRepository.save(car);
+					System.out.println("Success on create car. Car number: " + car.getNumber() + " -> " + car);
+				}
 				System.out.println("************************EndCreateCar************************");
 			}
 		} catch (Exception e) {
