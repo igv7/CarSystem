@@ -70,6 +70,7 @@ public class ClientReceipt {
 	
 //	@Field("carPrice")
 	private double carPrice;
+	
 
 
 }

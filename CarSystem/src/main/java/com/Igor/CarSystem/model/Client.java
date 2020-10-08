@@ -50,5 +50,7 @@ public class Client {
 //	@OneToMany
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
 	private List<Car> cars = new ArrayList<>();
+	
+	
 
 }

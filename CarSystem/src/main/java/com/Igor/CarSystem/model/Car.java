@@ -47,5 +47,7 @@ public class Car {
 	
 	@Column(name = "IMAGE")
 	private String image;
+	
+	
 
 }
