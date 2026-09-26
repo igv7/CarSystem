@@ -29,8 +29,13 @@ public class AdminController {
 	@Autowired
 	private Map<String, ClientSession> tokensMap;
 
+	// Only admin sessions may use these endpoints; a client token is treated as unauthorized
 	private ClientSession isActive(String token) {
-		return tokensMap.get(token);
+		ClientSession clientSession = tokensMap.get(token);
+		if (clientSession != null && clientSession.getFacade() instanceof AdminServiceImpl) {
+			return clientSession;
+		}
+		return null;
 	}
 
 	@Autowired

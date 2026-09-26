@@ -53,6 +53,7 @@ public class CarSystem {
 				System.out.println("Welcome Admin! You're logged into The Car System");
 				return adminServiceImpl;
 			}
+			break;
 		case CLIENT:
 			Client client = clientRepository.findByNameAndPassword(userName, password);
 			if (client != null) {

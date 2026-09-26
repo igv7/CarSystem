@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.Igor.CarSystem.exceptions.ClientDoesntExist;
@@ -16,6 +17,7 @@ import com.Igor.CarSystem.repo.ClientRepository;
 import com.Igor.CarSystem.utils.DateFormatter;
 
 @Service
+@Scope("prototype") // one instance per logged-in client, created in CarSystem.login
 public class ClientServiceImpl implements ClientService, Facade {
 
 	@Autowired

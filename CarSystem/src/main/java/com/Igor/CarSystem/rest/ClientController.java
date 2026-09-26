@@ -22,12 +22,14 @@ public class ClientController {
 	@Autowired
 	private Map<String, ClientSession> tokensMap;
 
+	// Only client sessions may use these endpoints; an admin token is treated as unauthorized
 	private ClientSession isActive(String token) {
-		return tokensMap.get(token);
+		ClientSession clientSession = tokensMap.get(token);
+		if (clientSession != null && clientSession.getFacade() instanceof ClientServiceImpl) {
+			return clientSession;
+		}
+		return null;
 	}
-
-	@Autowired
-	private ClientServiceImpl clientServiceImpl;
 
 
 	// Add Car
@@ -36,6 +38,7 @@ public class ClientController {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
+			ClientServiceImpl clientServiceImpl = (ClientServiceImpl) clientSession.getFacade();
 			try {
 				return new ResponseEntity<>(clientServiceImpl.getCar(id), HttpStatus.OK);
 			} catch (Exception e) {
@@ -54,6 +57,7 @@ public class ClientController {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
+			ClientServiceImpl clientServiceImpl = (ClientServiceImpl) clientSession.getFacade();
 			try {
 				return new ResponseEntity<>(clientServiceImpl.getCars(), HttpStatus.OK);
 			} catch (Exception e) {
@@ -71,6 +75,7 @@ public class ClientController {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
+			ClientServiceImpl clientServiceImpl = (ClientServiceImpl) clientSession.getFacade();
 			try {
 				return new ResponseEntity<>(clientServiceImpl.getMyCars(), HttpStatus.OK);
 			} catch (Exception e) {
@@ -88,6 +93,7 @@ public class ClientController {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
+			ClientServiceImpl clientServiceImpl = (ClientServiceImpl) clientSession.getFacade();
 			try {
 				return new ResponseEntity<>(clientServiceImpl.returnCar(id), HttpStatus.OK);
 			} catch (Exception e) {
@@ -105,6 +111,7 @@ public class ClientController {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
+			ClientServiceImpl clientServiceImpl = (ClientServiceImpl) clientSession.getFacade();
 			try {
 				return new ResponseEntity<>(clientServiceImpl.getReceiptsByClient(), HttpStatus.OK);
 			} catch (Exception e) {
@@ -122,6 +129,7 @@ public class ClientController {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
+			ClientServiceImpl clientServiceImpl = (ClientServiceImpl) clientSession.getFacade();
 			try {
 				return new ResponseEntity<>(clientServiceImpl.getBalance(), HttpStatus.OK);
 			} catch (Exception e) {
@@ -139,6 +147,7 @@ public class ClientController {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
+			ClientServiceImpl clientServiceImpl = (ClientServiceImpl) clientSession.getFacade();
 			try {
 				return new ResponseEntity<>(clientServiceImpl.deleteAccount(), HttpStatus.OK);
 			} catch (Exception e) {
