@@ -20,6 +20,7 @@ import com.Igor.CarSystem.task.ClientSession;
 
 
 
+/** Login endpoint that issues session tokens for both admins and clients. */
 @RestController
 @RequestMapping("/carSystem")
 public class LoginController {
@@ -33,6 +34,15 @@ public class LoginController {
 	private CarSystem carSystem;
 	
 	
+	/**
+	 * POST /carSystem/login. Checks the credentials and, on success, stores a new session
+	 * under a random token and returns it.
+	 *
+	 * @param userName admin or client name
+	 * @param password password
+	 * @param type "ADMIN" or "CLIENT"
+	 * @return 200 with the token, or 401 with the reason
+	 */
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestParam String userName, @RequestParam String password, @RequestParam String type) {
 		if (!type.equals("ADMIN") && !type.equals("CLIENT")) {

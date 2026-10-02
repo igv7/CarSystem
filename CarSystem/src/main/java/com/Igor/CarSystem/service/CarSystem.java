@@ -14,6 +14,7 @@ import com.Igor.CarSystem.model.Client;
 import com.Igor.CarSystem.repo.ClientRepository;
 import com.Igor.CarSystem.task.SessionTimeout;
 
+/** Application core: starts and stops the session-timeout thread and authenticates logins. */
 @Service
 public class CarSystem {
 
@@ -36,6 +37,7 @@ public class CarSystem {
 
 		
 
+	/** Runs at startup: starts the session-timeout thread. */
 	@PostConstruct
 	public void init() {
 		log.info("Welcome to the Car System!");
@@ -43,6 +45,7 @@ public class CarSystem {
 		sessionTask.start();
 	}
 
+	/** Runs at shutdown: stops the session-timeout thread. */
 	@PreDestroy
 	public void destroy() {
 		log.info("The Car System is shut down.");
@@ -50,6 +53,14 @@ public class CarSystem {
 //		context.close();
 	}
 
+	/**
+	 * Checks credentials and returns the service the user will work with.
+	 * The admin account is hard-coded as admin / 1234. A client gets a new {@link ClientServiceImpl}
+	 * bound to their ID.
+	 *
+	 * @return {@link AdminServiceImpl} for the admin, a new {@link ClientServiceImpl} for a client
+	 * @throws Exception if the credentials are wrong
+	 */
 	public Facade login(String userName, String password, ClientType type) throws Exception {
 		switch (type) {
 		case ADMIN:

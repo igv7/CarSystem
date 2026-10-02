@@ -24,6 +24,10 @@ import com.Igor.CarSystem.service.AdminServiceImpl;
 import com.Igor.CarSystem.service.ClientReceiptServiceImpl;
 import com.Igor.CarSystem.task.ClientSession;
 
+/**
+ * Admin endpoints for managing clients, cars and receipts.
+ * Every endpoint takes an admin session token in the path; an unknown, expired or client token gets 401.
+ */
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -33,7 +37,10 @@ public class AdminController {
 	@Autowired
 	private Map<String, ClientSession> tokensMap;
 
-	// Only admin sessions may use these endpoints; a client token is treated as unauthorized
+	/**
+	 * Finds the admin session for a token.
+	 * @return the session, or null if the token is unknown, expired or belongs to a client
+	 */
 	private ClientSession isActive(String token) {
 		ClientSession clientSession = tokensMap.get(token);
 		if (clientSession != null && clientSession.getFacade() instanceof AdminServiceImpl) {
@@ -50,7 +57,10 @@ public class AdminController {
 	private ClientReceiptServiceImpl clientReceiptServiceImpl;
 
 	// Client Operations
-	// Add Client
+	/**
+	 * POST /admin/addClient/{token}. Creates a client from the JSON body.
+	 * @return 200 with the client (not saved if required fields are missing), or 400 if the name is taken
+	 */
 	@PostMapping("/addClient/{token}")
 	public ResponseEntity<?> createClient(@RequestBody Client client, @PathVariable("token") String token) {
 		ClientSession clientSession = isActive(token);
@@ -67,7 +77,10 @@ public class AdminController {
 		}
 	}
 
-	// Update Client
+	/**
+	 * PUT /admin/updateClient/{token}/{id}. Overwrites a client's details with the JSON body.
+	 * The client is identified by the {@code id} inside the body; the {@code id} path variable is not used.
+	 */
 	@PutMapping("/updateClient/{token}/{id}")
 	public ResponseEntity<?> updateClient(@RequestBody Client client, @PathVariable("token") String token,
 			@PathVariable int id) {
@@ -85,7 +98,7 @@ public class AdminController {
 		}
 	}
 
-	// View Client
+	/** GET /admin/viewClient/{token}/{id}. One client, or 400 if it doesn't exist. */
 	@GetMapping("/viewClient/{token}/{id}")
 	public ResponseEntity<?> getClient(@PathVariable("token") String token, @PathVariable("id") int id) {
 		ClientSession clientSession = isActive(token);
@@ -102,7 +115,7 @@ public class AdminController {
 		}
 	}
 
-	// View All Clients
+	/** GET /admin/viewAllClients/{token}. All clients, or 400 if there are none. */
 	@GetMapping("/viewAllClients/{token}")
 	public ResponseEntity<?> getAllClients(@PathVariable String token) {
 		ClientSession clientSession = isActive(token);
@@ -119,7 +132,7 @@ public class AdminController {
 		}
 	}
 
-	// Delete Client
+	/** DELETE /admin/deleteClient/{token}/{id}. Deletes a client and marks their rented cars available again; the cars stay in the catalogue. */
 	@DeleteMapping("/deleteClient/{token}/{id}")
 	public ResponseEntity<?> removeClient(@PathVariable("token") String token, @PathVariable("id") int id) {
 		ClientSession clientSession = isActive(token);
@@ -139,7 +152,10 @@ public class AdminController {
 	// ******************************************************************************************************************
 
 	// Car Operations
-	// Add Car
+	/**
+	 * POST /admin/addCar/{token}. Creates a car from the JSON body.
+	 * @return 200 with the car (always created available, amount = 1; not saved if a field is missing or the price is 0), or 400 if the number is taken
+	 */
 	@PostMapping("/addCar/{token}")
 	public ResponseEntity<?> createCar(@RequestBody Car car, @PathVariable("token") String token) {
 		ClientSession clientSession = isActive(token);
@@ -156,7 +172,10 @@ public class AdminController {
 		}
 	}
 
-	// Update Car
+	/**
+	 * PUT /admin/updateCar/{token}/{id}. Overwrites a car's details with the JSON body.
+	 * The car is identified by the {@code id} inside the body; the {@code id} path variable is not used.
+	 */
 	@PutMapping("/updateCar/{token}/{id}")
 	public ResponseEntity<?> updateCar(@RequestBody Car car, @PathVariable("token") String token,
 			@PathVariable("id") int id) {
@@ -174,7 +193,7 @@ public class AdminController {
 		}
 	}
 
-	// View Car By Id
+	/** GET /admin/viewCar/{token}/{id}. One car by ID, or 400 if it doesn't exist. */
 	@GetMapping("/viewCar/{token}/{id}")
 	public ResponseEntity<?> getCar(@PathVariable("token") String token, @PathVariable("id") int id) {
 		ClientSession clientSession = isActive(token);
@@ -191,7 +210,7 @@ public class AdminController {
 		}
 	}
 
-	// View Car By CarNumber
+	/** GET /admin/viewCarByNumber/{token}/{number}. One car by number, or 400 if it doesn't exist. */
 	@GetMapping("/viewCarByNumber/{token}/{number}")
 	public ResponseEntity<?> getCarByNumber(@PathVariable("token") String token,
 			@PathVariable("number") String number) {
@@ -209,7 +228,7 @@ public class AdminController {
 		}
 	}
 
-	// View All Cars
+	/** GET /admin/viewAllCars/{token}. All cars, or 400 if there are none. */
 	@GetMapping("/viewAllCars/{token}")
 	public ResponseEntity<?> getAllCars(@PathVariable String token) {
 		ClientSession clientSession = isActive(token);
@@ -226,7 +245,7 @@ public class AdminController {
 		}
 	}
 
-	// Delete Car
+	/** DELETE /admin/deleteCar/{token}/{id}. Deletes a car, unlinking it from the client renting it. */
 	@DeleteMapping("/deleteCar/{token}/{id}")
 	public ResponseEntity<?> removeCar(@PathVariable("token") String token, @PathVariable("id") int id) {
 		ClientSession clientSession = isActive(token);
@@ -243,7 +262,7 @@ public class AdminController {
 		}
 	}
 
-	// Return Car
+	/** DELETE /admin/returnCar/{token}/{id}. Returns a rented car on the client's behalf and marks it available (amount = 1). */
 	@DeleteMapping("/returnCar/{token}/{id}")
 	public ResponseEntity<?> returnCar(@PathVariable("token") String token, @PathVariable("id") int id) {
 		ClientSession clientSession = isActive(token);
@@ -260,7 +279,7 @@ public class AdminController {
 		}
 	}
 
-	// View all Cars By CarType
+	/** GET /admin/viewAllCarsByCarType/{token}/{type}. All cars of one make. */
 	@GetMapping("/viewAllCarsByCarType/{token}/{type}")
 	public ResponseEntity<?> getAllCarsByCarType(@PathVariable("token") String token,
 			@PathVariable("type") CarType type) {
@@ -278,7 +297,7 @@ public class AdminController {
 		}
 	}
 
-	// View all Cars By CarColor
+	/** GET /admin/viewAllCarsByCarColor/{token}/{color}. All cars of one color. */
 	@GetMapping("/viewAllCarsByCarColor/{token}/{color}")
 	public ResponseEntity<?> getAllCarsByCarColor(@PathVariable("token") String token,
 			@PathVariable("color") CarColor color) {
@@ -296,7 +315,7 @@ public class AdminController {
 		}
 	}
 
-	// View Client Car By CarNumber
+	/** GET /admin/viewClientCarByNumber/{token}/{id}/{number}. A car by number, if client {@code id} rents any cars. */
 	@GetMapping("/viewClientCarByNumber/{token}/{id}/{number}")
 	public ResponseEntity<?> getClientCarByNumber(@PathVariable("token") String token, @PathVariable("id") int id,
 			@PathVariable("number") String number) {
@@ -314,7 +333,7 @@ public class AdminController {
 		}
 	}
 
-	// View All Client Cars
+	/** GET /admin/viewAllClientCars/{token}/{id}. All cars rented by client {@code id}. */
 	@GetMapping("/viewAllClientCars/{token}/{id}")
 	public ResponseEntity<?> getAllClientCars(@PathVariable("token") String token, @PathVariable("id") int id) {
 		ClientSession clientSession = isActive(token);
@@ -331,7 +350,7 @@ public class AdminController {
 		}
 	}
 
-	// View All Client Cars By CarType
+	/** GET /admin/viewAllClientCarsByType/{token}/{id}/{type}. Cars of one make rented by client {@code id}. */
 	@GetMapping("/viewAllClientCarsByType/{token}/{id}/{type}")
 	public ResponseEntity<?> getAllClientCarsByType(@PathVariable("token") String token, @PathVariable("id") int id,
 			@PathVariable("type") CarType type) {
@@ -349,7 +368,7 @@ public class AdminController {
 		}
 	}
 
-	// View All Client Cars By CarColor
+	/** GET /admin/viewAllClientCarsByColor/{token}/{id}/{color}. Cars of one color rented by client {@code id}. */
 	@GetMapping("/viewAllClientCarsByColor/{token}/{id}/{color}")
 	public ResponseEntity<?> getAllClientCarsByColor(@PathVariable("token") String token, @PathVariable("id") int id,
 			@PathVariable("color") CarColor color) {
@@ -367,7 +386,7 @@ public class AdminController {
 		}
 	}
 
-	// View All Client Cars By Price (until)
+	/** GET /admin/viewAllClientCarsByPrice/{token}/{id}/{price}. Cars rented by client {@code id} costing at most {@code price}. */
 	@GetMapping("/viewAllClientCarsByPrice/{token}/{id}/{price}")
 	public ResponseEntity<?> getAllClientCarsByPrice(@PathVariable("token") String token, @PathVariable("id") int id,
 			@PathVariable("price") double price) {
@@ -386,7 +405,7 @@ public class AdminController {
 	}
 
 	// Receipts********************************************************************************************************
-	// View Receipts By Client
+	/** GET /admin/viewReceiptsByClient/{token}/{id}. All receipts of client {@code id}. */
 	@GetMapping("/viewReceiptsByClient/{token}/{id}")
 	public ResponseEntity<?> getReceiptsByClient(@PathVariable("token") String token, @PathVariable("id") int id) {
 		ClientSession clientSession = isActive(token);
@@ -403,7 +422,7 @@ public class AdminController {
 		}
 	}
 
-	// View All Receipts
+	/** GET /admin/viewAllReceipts/{token}. All receipts of all clients. */
 	@GetMapping("/viewAllReceipts/{token}")
 	public ResponseEntity<?> getAllReceipts(@PathVariable("token") String token) {
 		ClientSession clientSession = isActive(token);

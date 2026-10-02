@@ -6,10 +6,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+/** CORS setup for the Angular frontend. */
 @SuppressWarnings("deprecation")
 @Configuration
 public class MyConfiguration {
 	
+	/** Allows all HTTP methods, with credentials, from the Angular dev server on http://localhost:4200 only. */
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurerAdapter() {

@@ -18,6 +18,10 @@ import com.Igor.CarSystem.repo.ClientReceiptRepository;
 import com.Igor.CarSystem.repo.ClientRepository;
 import com.Igor.CarSystem.utils.DateFormatter;
 
+/**
+ * Operations of one logged-in client. Prototype-scoped: {@link CarSystem#login} creates one
+ * instance per client login, and it lives in that client's session.
+ */
 @Service
 @Scope("prototype") // one instance per logged-in client, created in CarSystem.login
 public class ClientServiceImpl implements ClientService, Facade {
@@ -36,14 +40,21 @@ public class ClientServiceImpl implements ClientService, Facade {
 	@Autowired
 	private ClientReceiptServiceImpl clientReceiptServiceImpl;
 
+	/** ID of the client this instance acts for; set once at login. */
 	private int clientId;
 
+	/** Called by {@link CarSystem#login} right after the instance is created. */
 	@Override
 	public void setClientId(int clientId) {
 		this.clientId = clientId;
 	}
 
-	// Add Car
+	/**
+	 * Rents car {@code id}: marks it rented (amount = 0), adds it to the client's cars, subtracts its price
+	 * from the balance and stores a receipt in MongoDB.
+	 * @throws Exception if the balance is negative, the car is already rented,
+	 * or doesn't exist
+	 */
 	@Override
 	public Car getCar(int id) throws Exception {
 		log.debug("************************StartClientGetCar************************");
@@ -73,7 +84,7 @@ public class ClientServiceImpl implements ClientService, Facade {
 				car = carRepository.getOne(id);
 				if (car.getAmount() > 0) {
 					client = clientRepository.getOne(clientId);
-					car.setAmount(car.getAmount() - 1);
+					car.setAmount(0);
 					client.getCars().add(car);
 					client.setBalance(client.getBalance() - car.getPrice());
 					clientRepository.save(client);
@@ -107,7 +118,7 @@ public class ClientServiceImpl implements ClientService, Facade {
 		return null;
 	}
 
-	// Get Cars
+	/** @throws Exception if there are no cars */
 	@Override
 	public List<Car> getCars() throws Exception {
 		log.debug("************************StartGetCars************************");
@@ -127,7 +138,10 @@ public class ClientServiceImpl implements ClientService, Facade {
 		}
 	}
 
-	// Get My Cars
+	/**
+	 * Cars this client currently rents.
+	 * @throws Exception if the client rents no cars
+	 */
 	public List<Car> getMyCars() throws Exception {
 		log.debug("************************StartGetMyCars************************");
 		Client client = clientRepository.findById(clientId).get();
@@ -149,23 +163,25 @@ public class ClientServiceImpl implements ClientService, Facade {
 
 	}
 
-	// Return Car
+	/**
+	 * Returns car {@code id}: removes it from the client's cars and marks it available (amount = 1).
+	 * @throws Exception if the client doesn't rent this car
+	 */
 	@Override
 	public Car returnCar(int id) throws Exception {
 		log.debug("************************StartReturnCar************************");
-		List<Car> cars = carRepository.findAll();
 		Client client = clientRepository.findById(clientId).get();
 		Car car = null;
 		try {
-			if (carRepository.findClientCar(client.getId()).isEmpty()) {
-				throw new Exception("Failed to get all " + client.getName() + " cars! Data is empty.");
+			Optional<Car> rented = client.getCars().stream().filter(c -> c.getId() == id).findFirst();
+			if (!rented.isPresent()) {
+				throw new Exception("Client " + client.getName() + " doesn't rent car id: " + id);
 			} else {
-				car = carRepository.getOne(id);
-				car.setAmount(car.getAmount() + 1);
-				carRepository.save(car);
-				carRepository.saveAll(cars);
+				car = rented.get();
 				client.getCars().remove(car);
 				clientRepository.save(client);
+				car.setAmount(1);
+				carRepository.save(car);
 				log.info("Success on return Car. Client name: " + client.getName() + ", Car: " + car);
 				log.debug("************************EndReturnCar************************");
 				return car;
@@ -177,7 +193,10 @@ public class ClientServiceImpl implements ClientService, Facade {
 
 	}
 
-	// Get Receipts By Client
+	/**
+	 * This client's receipts.
+	 * @throws Exception if the client has no receipts
+	 */
 	public List<ClientReceipt> getReceiptsByClient() throws Exception {
 		log.debug("************************StartGetReceiptsByClient************************");
 		Client client = clientRepository.findById(clientId).get();
@@ -197,7 +216,10 @@ public class ClientServiceImpl implements ClientService, Facade {
 		}
 	}
 
-	// Get Balance
+	/**
+	 * This client's current balance.
+	 * @throws Exception if the client no longer exists
+	 */
 	public double getBalance() throws Exception {
 		log.debug("************************StartGetBalance************************");
 		Client temp = null;
@@ -220,7 +242,12 @@ public class ClientServiceImpl implements ClientService, Facade {
 		return temp.getBalance();
 	}
 
-	// Delete Account
+	/**
+	 * Marks the client's rented cars available (amount = 1) and deletes the client. The cars stay in the catalogue.
+	 * The session token stays valid until it times out.
+	 * @return the deleted client
+	 * @throws Exception if the client no longer exists
+	 */
 	public Client deleteAccount() throws Exception {
 		log.debug("************************StartDeleteAccount************************");
 		List<Car> cars = carRepository.findAll();
@@ -232,7 +259,7 @@ public class ClientServiceImpl implements ClientService, Facade {
 			} else {
 				temp = optional.get();
 				for (Car car : temp.getCars()) {
-					car.setAmount(car.getAmount() + 1);
+					car.setAmount(1);
 					carRepository.save(car);
 				}
 				carRepository.saveAll(cars);

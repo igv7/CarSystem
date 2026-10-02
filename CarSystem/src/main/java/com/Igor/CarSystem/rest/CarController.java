@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.Igor.CarSystem.enums.CarType;
 import com.Igor.CarSystem.service.CarServiceImpl;
 
+/** Public car catalogue endpoints; no token needed. */
 @RestController
 @RequestMapping("/car")
 public class CarController {
@@ -22,7 +23,7 @@ public class CarController {
 	@Autowired
 	private CarServiceImpl carServiceImpl;
 
-	// View All Cars
+	/** GET /car/viewAllCars. All cars, or 400 if there are none. */
 	@GetMapping("/viewAllCars")
 	public ResponseEntity<?> getAllCars() {
 		try {
@@ -34,7 +35,7 @@ public class CarController {
 
 	}
 
-	// View all Cars By CarType
+	/** GET /car/viewAllCarsByCarType/{type}. All cars of one make, or 400 if there are no cars at all. */
 	@GetMapping("/viewAllCarsByCarType/{type}")
 	public ResponseEntity<?> getAllCarsByCarType(@PathVariable("type") CarType type) {
 		try {

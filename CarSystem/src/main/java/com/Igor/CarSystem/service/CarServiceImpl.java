@@ -11,6 +11,7 @@ import com.Igor.CarSystem.enums.CarType;
 import com.Igor.CarSystem.model.Car;
 import com.Igor.CarSystem.repo.CarRepository;
 
+/** Read-only car catalogue used by the public {@code CarController}. */
 @Service
 public class CarServiceImpl implements CarService, Facade {
 
@@ -19,7 +20,7 @@ public class CarServiceImpl implements CarService, Facade {
 	@Autowired
 	private CarRepository carRepository;
 
-	// Get all Cars
+	/** @throws Exception if there are no cars */
 	@Override
 	public List<Car> getAllCars() throws Exception {
 		log.debug("************************StartGetAllCars************************");
@@ -40,7 +41,7 @@ public class CarServiceImpl implements CarService, Facade {
 
 	}
 
-	// Get all Cars By CarType
+	/** @throws Exception if there are no cars at all */
 	@Override
 	public List<Car> getAllCarsByType(CarType type) throws Exception {
 		log.debug("************************StartGetAllCarsByType************************");

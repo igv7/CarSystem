@@ -10,6 +10,7 @@ import com.Igor.CarSystem.repo.ClientRepository;
 
 
 
+/** Self-registration of new clients. Unlike the admin's createClient, no fields are required. */
 @Service
 public class SignUpServiceImpl implements SignUpService, Facade {
 
@@ -18,6 +19,11 @@ public class SignUpServiceImpl implements SignUpService, Facade {
 	@Autowired
 	private ClientRepository clientRepository;
 
+	/**
+	 * Saves the client.
+	 * @return the saved client
+	 * @throws Exception if the name is already taken or saving fails
+	 */
 	@Override
 	public Client signUp(Client client) throws Exception {
 		log.debug("************************StartSignUp************************");

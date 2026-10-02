@@ -18,6 +18,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Receipt written to MongoDB (collection "clientReceipt") each time a client rents a car.
+ * Holds a copy of the client and car details at the time of rental.
+ */
 @Document(collection = "clientReceipt")
 @Data
 @NoArgsConstructor
@@ -25,12 +29,18 @@ import lombok.NoArgsConstructor;
 @Component
 public class ClientReceipt {
 	
+	/** Next receipt ID. Kept in memory only, so it restarts at 1 when the application restarts. */
 	private static long id = 1;
 
+	/**
+	 * Returns the next receipt ID and advances the counter.
+	 * @return the receipt ID to use for a new receipt
+	 */
 	public static long incrementId() {
 		return id++;
 	}
 	
+	/** Mongo document ID; set from {@link #incrementId()} when the receipt is created. */
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 //	@Field("receiptID")
@@ -48,9 +58,11 @@ public class ClientReceipt {
 //	@Field("clientEmail")
 	private String clientEmail;
 	
+	/** Client's balance right after paying for this rental. */
 //	@Field("clientBalance")
 	private double clientBalance;
 	
+	/** Rental time, formatted "yyyy-MM-dd HH:mm". */
 //	@Field("receiptDate")
 	private String receiptDate;
 	
@@ -68,6 +80,7 @@ public class ClientReceipt {
 	@Enumerated(EnumType.STRING)
 	private CarType carType;
 	
+	/** Price the client paid for the car. */
 //	@Field("carPrice")
 	private double carPrice;
 	

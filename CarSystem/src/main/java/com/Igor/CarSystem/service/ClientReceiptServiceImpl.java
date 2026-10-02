@@ -14,6 +14,7 @@ import com.Igor.CarSystem.repo.ClientRepository;
 
 
 
+/** Saves and reads rental receipts in MongoDB. */
 @Service
 public class ClientReceiptServiceImpl implements ClientReceiptService, Facade {
 
@@ -27,7 +28,10 @@ public class ClientReceiptServiceImpl implements ClientReceiptService, Facade {
 	private ClientRepository clientRepository;
 	
 
-	//Store Receipt
+	/**
+	 * Saves a receipt in MongoDB.
+	 * @return the saved receipt
+	 */
 	@Override
 	public ClientReceipt takeReceipt(ClientReceipt clientReceipt) throws Exception {
 		log.debug("************************StartTakeReceipt************************");
@@ -43,7 +47,7 @@ public class ClientReceiptServiceImpl implements ClientReceiptService, Facade {
 
 	}
 
-	//Get All Receipts
+	/** @throws Exception if there are no receipts */
 	public List<ClientReceipt> getAllReceipts() throws Exception {
 		log.debug("************************StartGetAllReceipts************************");
 		List<ClientReceipt> receipts = null;
@@ -62,7 +66,10 @@ public class ClientReceiptServiceImpl implements ClientReceiptService, Facade {
 		}
 	}
 
-	//Get Receipts By Client
+	/**
+	 * All receipts of client {@code clientId}.
+	 * @throws Exception if the client has no receipts
+	 */
 	public List<ClientReceipt> getReceiptsByClient(int clientId) throws Exception {
 		log.debug("************************StartGetReceiptsByClient************************");
 		Client client = clientRepository.findById(clientId).get();

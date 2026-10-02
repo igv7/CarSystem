@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/** Background thread that removes sessions idle for more than 30 minutes, checking once a minute. */
 @Component
 public class SessionTimeout {
 
@@ -17,8 +18,10 @@ public class SessionTimeout {
 	@Autowired
 	private Map<String, ClientSession> tokensMap;
 	
+	/** Set by {@link #stop()} to end the thread after its current sleep. */
 	private boolean stop = false;
 	
+	/** Starts the cleanup thread. Called once from {@code CarSystem.init()}. */
 	public void start() {
 		new Thread(new Runnable() {
 			
@@ -48,6 +51,7 @@ public class SessionTimeout {
 		}).start();
 	}
 	
+	/** Asks the cleanup thread to finish. Called from {@code CarSystem.destroy()}. */
 	public void stop() {
 		this.stop = true;
 	}

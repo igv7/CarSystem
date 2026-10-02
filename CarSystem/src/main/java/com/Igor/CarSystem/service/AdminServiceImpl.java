@@ -17,6 +17,7 @@ import com.Igor.CarSystem.model.Client;
 import com.Igor.CarSystem.repo.CarRepository;
 import com.Igor.CarSystem.repo.ClientRepository;
 
+/** Admin operations. A single shared instance; it is the {@link Facade} stored in every admin session. */
 @Service
 public class AdminServiceImpl implements AdminService, Facade {
 
@@ -29,7 +30,11 @@ public class AdminServiceImpl implements AdminService, Facade {
 	private CarRepository carRepository;
 
 	// Client Operations
-	// Create Client
+	/**
+	 * Saves a new client. If any required field (name, birthday, password, phone, email) is missing,
+	 * nothing is saved and the client is returned as given.
+	 * @throws Exception if the name is already taken
+	 */
 	@Override
 	public Client createClient(Client client) throws Exception {
 		log.debug("************************StartCreateClient************************");
@@ -53,7 +58,10 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return client;
 	}
 
-	// Update Client
+	/**
+	 * Copies all details from {@code client} onto the stored client with the same ID.
+	 * @throws Exception if no client has that ID
+	 */
 	@Override
 	public Client updateClient(Client client) throws Exception {
 		log.debug("************************StartUpdateClient************************");
@@ -82,7 +90,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	// Get Client By Id
+	/** @throws Exception if no client has that ID */
 	@Override
 	public Client getClientById(int id) throws Exception {
 		log.debug("************************StartGetClientById************************");
@@ -105,7 +113,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return temp;
 	}
 
-	// Get All Clients
+	/** @throws Exception if there are no clients */
 	@Override
 	public List<Client> getAllClients() throws Exception {
 		log.debug("************************StartGetAllClientsById************************");
@@ -126,7 +134,11 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	// Delete Client
+	/**
+	 * Marks every car the client rents available (amount = 1), then deletes the client. The cars stay in the catalogue.
+	 * @return the deleted client
+	 * @throws Exception if no client has that ID
+	 */
 	@Override
 	public Client deleteClient(int id) throws Exception {
 		log.debug("************************StartDeleteClient************************");
@@ -139,7 +151,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 			} else {
 				temp = optional.get();
 				for (Car car : temp.getCars()) {
-					car.setAmount(car.getAmount() + 1);
+					car.setAmount(1);
 					carRepository.save(car);
 				}
 				carRepository.saveAll(cars);
@@ -161,7 +173,11 @@ public class AdminServiceImpl implements AdminService, Facade {
 	// **************************************************************************************************************
 
 	// Car Operations
-	// Create Car
+	/**
+	 * Saves a new car as available (amount = 1, whatever was sent). If the number, color, type or image
+	 * is missing, or the price is 0, nothing is saved and the car is returned as given.
+	 * @throws Exception if the number is already taken
+	 */
 	@Override
 	public Car createCar(Car car) throws Exception {
 		log.debug("************************StartCreateCar************************");
@@ -169,7 +185,8 @@ public class AdminServiceImpl implements AdminService, Facade {
 			if (carRepository.existsByNumber(car.getNumber())) {
 				throw new Exception("This car number already exist in system, please try another number.");
 			} else {
-				if (car.getNumber() != null && car.getColor() != null && car.getType() != null && car.getAmount() != 0
+				car.setAmount(1);
+				if (car.getNumber() != null && car.getColor() != null && car.getType() != null
 						&& car.getPrice() != 0 && car.getImage() != null) {
 					carRepository.save(car);
 					log.info("Success on create car. Car number: " + car.getNumber() + " -> " + car);
@@ -185,7 +202,10 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return car;
 	}
 
-	// Update Car
+	/**
+	 * Copies all details from {@code car} onto the stored car with the same ID.
+	 * @throws Exception if no car has that ID, or the amount is not 0 (rented) or 1 (available)
+	 */
 	@Override
 	public Car updateCar(Car car) throws Exception {
 		log.debug("************************StartUpdateCar************************");
@@ -194,6 +214,8 @@ public class AdminServiceImpl implements AdminService, Facade {
 			Optional<Car> optional = carRepository.findById(car.getId());
 			if (!optional.isPresent()) {
 				throw new Exception("Car doesn't exist");
+			} else if (car.getAmount() != 0 && car.getAmount() != 1) {
+				throw new Exception("Car amount must be 0 (rented) or 1 (available), got " + car.getAmount());
 			} else {
 				temp = optional.get();
 				temp.setNumber(car.getNumber());
@@ -214,7 +236,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	// Get Car By Id
+	/** @throws Exception if no car has that ID */
 	@Override
 	public Car getCarById(int id) throws Exception {
 		log.debug("************************StartGetCarById************************");
@@ -237,7 +259,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return temp;
 	}
 
-	// Get Car By CarNumber
+	/** @throws Exception if no car has that number */
 	@Override
 	public Car getCarByNumber(String number) throws Exception {
 		log.debug("************************StartGetCarByNumber************************");
@@ -260,7 +282,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return temp;
 	}
 
-	// Get All Cars
+	/** @throws Exception if there are no cars */
 	@Override
 	public List<Car> getAllCars() throws Exception {
 		log.debug("************************StartGetAllCars************************");
@@ -281,7 +303,11 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	// Delete Car
+	/**
+	 * Removes the car from the client renting it (if any) and deletes it.
+	 * @return the deleted car
+	 * @throws Exception if no car has that ID
+	 */
 	@Override
 	public Car deleteCar(int id) throws Exception {
 		log.debug("************************StartDeleteCar************************");
@@ -311,7 +337,11 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	// Return Car
+	/**
+	 * Takes the car back from the client renting it and marks it available (amount = 1). Does nothing
+	 * if nobody rents it.
+	 * @throws Exception if no car has that ID
+	 */
 	public Car returnCar(int id) throws Exception {
 		log.debug("************************StartReturnCar************************");
 		Client client = clientRepository.findClientByCar(id);
@@ -323,7 +353,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 			} else {
 				temp = optional.get();
 				if (client != null) {
-					temp.setAmount(temp.getAmount() + 1);
+					temp.setAmount(1);
 					carRepository.save(temp);
 					client.getCars().remove(temp);
 					clientRepository.save(client);
@@ -341,7 +371,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	// Get all Cars By CarType
+	/** @throws Exception if there are no cars at all */
 	public List<Car> getAllCarsByType(CarType type) throws Exception {
 		log.debug("************************StartGetAllCarsByType************************");
 		List<Car> cars = null;
@@ -361,7 +391,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	// Get all Cars By CarColor
+	/** @throws Exception if there are no cars at all */
 	public List<Car> getAllCarsByColor(CarColor color) throws Exception {
 		log.debug("************************StartGetAllCarsByColor************************");
 		List<Car> cars = null;
@@ -381,7 +411,11 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	// Get Client Car By CarNumber
+	/**
+	 * Finds a car by number, provided the client rents at least one car.
+	 * Note: the car itself is not checked to be one of the client's cars.
+	 * @throws Exception if the client rents no cars or the number doesn't exist
+	 */
 	public Car getClientCarByNumber(int clientId, String number) throws Exception {
 		log.debug("************************StartGetClientCarByNumber************************");
 		Client client = clientRepository.findById(clientId).get();
@@ -409,7 +443,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return temp;
 	}
 
-	// Get All Client Cars
+	/** @throws Exception if the client rents no cars */
 	public List<Car> getAllClientCars(int clientId) throws Exception {
 		log.debug("************************StartGetAllClientCars************************");
 		Client client = clientRepository.findById(clientId).get();
@@ -431,7 +465,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	// Get All Client Cars By CarType
+	/** @throws Exception if the client rents no cars */
 	public List<Car> getAllClientCarsByType(int clientId, CarType type) throws Exception {
 		log.debug("************************StartGetAllClientCarsByType************************");
 		Client client = clientRepository.findById(clientId).get();
@@ -454,7 +488,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	// Get All Client Cars By CarColor
+	/** @throws Exception if the client rents no cars */
 	public List<Car> getAllClientCarsByColor(int clientId, CarColor color) throws Exception {
 		log.debug("************************StartGetAllClientCarsByColor************************");
 		Client client = clientRepository.findById(clientId).get();
@@ -477,7 +511,10 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	// Get All Client Cars By Price (until)
+	/**
+	 * Cars rented by the client costing at most {@code price}.
+	 * @throws Exception if the client rents no cars
+	 */
 	public List<Car> getAllClientCarsByPrice(int clientId, double price) throws Exception {
 		log.debug("************************StartGetAllClientCarsByPrice************************");
 		Client client = clientRepository.findById(clientId).get();

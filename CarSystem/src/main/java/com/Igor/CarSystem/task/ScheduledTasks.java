@@ -16,6 +16,7 @@ import com.Igor.CarSystem.repo.CarRepository;
 import com.Igor.CarSystem.repo.ClientRepository;
 
 
+/** Billing job. */
 @Component
 public class ScheduledTasks {
 
@@ -30,6 +31,10 @@ public class ScheduledTasks {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
 	
+	/**
+	 * Runs every 2 minutes. Each client with a positive balance pays the price of every car they rent;
+	 * each client with a balance of 0 or less has all their rented cars returned.
+	 */
 	@Scheduled(fixedRate = 1000 * 60 * 2) //1000 * 60 * 60 * 24
 	public void reportCurrentTime() {
 		log.debug("Billing job started at {}", dateFormat.format(new Date()));
@@ -39,9 +44,7 @@ public class ScheduledTasks {
 				List<Car> cars = carRepository.findClientCar(client.getId());
 				log.info("About to return cars : Client name: " +client.getName()+ ", balance: " +client.getBalance()+ ", cars: " + cars);
 				for (Car car : cars) {
-					if (car.getAmount() == 0) {
-						car.setAmount(car.getAmount() + 1);
-					}
+					car.setAmount(1);
 					carRepository.save(car);
 					log.debug("The saved car: " +car);
 					carRepository.saveAll(cars);

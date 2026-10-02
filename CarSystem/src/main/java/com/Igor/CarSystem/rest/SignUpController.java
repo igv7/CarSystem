@@ -15,6 +15,7 @@ import com.Igor.CarSystem.service.SignUpServiceImpl;
 
 
 
+/** Public sign-up endpoint; no token needed. */
 @RestController
 @RequestMapping("/carSystem")
 public class SignUpController {
@@ -25,7 +26,10 @@ public class SignUpController {
 	private SignUpServiceImpl signUpServiceImpl;
 	
 	
-	//Sign Up
+	/**
+	 * POST /carSystem/signUp. Registers a new client from the JSON body.
+	 * @return 200 with the saved client, or 400 if the name is taken or saving fails
+	 */
 	@PostMapping("/signUp")
 	public ResponseEntity<?> signUp(@RequestBody Client client) {
 		try {
