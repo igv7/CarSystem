@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(schema = "public", name = "client")
@@ -35,6 +36,7 @@ public class Client {
 	@Column(name = "DOB")
 	private String birthday;
 	
+	@ToString.Exclude // keep passwords out of log output
 	@Column(name = "PASSWORD")
 	private String password;
 	

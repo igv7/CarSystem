@@ -2,6 +2,8 @@ package com.Igor.CarSystem.rest;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,8 @@ import com.Igor.CarSystem.task.ClientSession;
 @RequestMapping("/admin")
 public class AdminController {
 
+	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
+
 	@Autowired
 	private Map<String, ClientSession> tokensMap;
 
@@ -35,6 +39,7 @@ public class AdminController {
 		if (clientSession != null && clientSession.getFacade() instanceof AdminServiceImpl) {
 			return clientSession;
 		}
+		log.info("Rejected admin request: token is unknown, expired or not an admin session");
 		return null;
 	}
 
@@ -54,7 +59,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.createClient(client), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to add client by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to add client by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -72,7 +77,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.updateClient(client), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to update client by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to update client by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -89,7 +94,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getClientById(id), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view client by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view client by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -106,7 +111,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllClients(), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view all clients by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view all clients by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -123,7 +128,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.deleteClient(id), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to delete client by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to delete client by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -143,7 +148,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.createCar(car), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to add car by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to add car by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -161,7 +166,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.updateCar(car), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to update car by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to update car by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -178,7 +183,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getCarById(id), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view car by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view car by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -196,7 +201,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getCarByNumber(number), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view car by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view car by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -213,7 +218,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllCars(), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view all cars by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view all cars by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -230,7 +235,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.deleteCar(id), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to delete car by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to delete car by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -247,7 +252,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.returnCar(id), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to return car by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to return car by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -265,7 +270,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllCarsByType(type), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Faild to get all cars by type!" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Faild to get all cars by type!", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -283,7 +288,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllCarsByColor(color), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Faild to get all cars by color!" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Faild to get all cars by color!", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -301,7 +306,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getClientCarByNumber(id, number), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view Client car by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view Client car by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -318,7 +323,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllClientCars(id), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view all Client cars by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view all Client cars by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -336,7 +341,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllClientCarsByType(id, type), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view all Client cars by type by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view all Client cars by type by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -354,7 +359,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllClientCarsByColor(id, color), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view all Client cars by color by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view all Client cars by color by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -372,7 +377,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllClientCarsByPrice(id, price), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view all Client cars by price by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view all Client cars by price by admin", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -390,7 +395,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(clientReceiptServiceImpl.getReceiptsByClient(id), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view Receipts By Client id: " + id + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view Receipts By Client id: " + id, HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -407,7 +412,7 @@ public class AdminController {
 			try {
 				return new ResponseEntity<>(clientReceiptServiceImpl.getAllReceipts(), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view all Receipts " + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view all Receipts ", HttpStatus.BAD_REQUEST);
 			}
 		} else {

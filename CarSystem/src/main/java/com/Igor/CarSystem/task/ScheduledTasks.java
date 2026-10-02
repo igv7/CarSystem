@@ -32,31 +32,31 @@ public class ScheduledTasks {
 	
 	@Scheduled(fixedRate = 1000 * 60 * 2) //1000 * 60 * 60 * 24
 	public void reportCurrentTime() {
-		log.info("The time is now {}", dateFormat.format(new Date()));
+		log.debug("Billing job started at {}", dateFormat.format(new Date()));
 		List<Client> clients = clientRepository.findAll();
 		for (Client client : clients) {
 			if (client != null && client.getBalance() <= 0) {
 				List<Car> cars = carRepository.findClientCar(client.getId());
-				System.out.println("About to return cars : Client name: " +client.getName()+ ", balance: " +client.getBalance()+ ", cars: " + cars);
+				log.info("About to return cars : Client name: " +client.getName()+ ", balance: " +client.getBalance()+ ", cars: " + cars);
 				for (Car car : cars) {
 					if (car.getAmount() == 0) {
 						car.setAmount(car.getAmount() + 1);
 					}
 					carRepository.save(car);
-					System.out.println("The saved car: " +car);
+					log.debug("The saved car: " +car);
 					carRepository.saveAll(cars);
-					System.out.println("Checking Car to return: "+client.getCars().remove(car)+ " "+car);
+					log.debug("Checking Car to return: "+client.getCars().remove(car)+ " "+car);
 					client.getCars().remove(car);
 					clientRepository.save(client);
-					System.out.println("Checking Car to return: "+client.getCars().remove(car)+ " "+car);
-					System.out.println("Car number: " +car.getNumber()+ " was returned by client " +client.getName()+ ". Your balance is: " +client.getBalance());
+					log.debug("Checking Car to return: "+client.getCars().remove(car)+ " "+car);
+					log.info("Car number: " +car.getNumber()+ " was returned by client " +client.getName()+ ". Your balance is: " +client.getBalance());
 				}
 			} else if (client != null && client.getBalance() > 0) {
 				List<Car> cars = carRepository.findClientCar(client.getId());
 				for (Car car : cars) {
 					client.setBalance(client.getBalance() - car.getPrice());
 					clientRepository.save(client);
-					System.out.println(client.getName()+ ", Thanks for your payment! Have a nice day! Your balance is: " +client.getBalance());
+					log.info(client.getName()+ ", Thanks for your payment! Have a nice day! Your balance is: " +client.getBalance());
 				}
 				
 			}

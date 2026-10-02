@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SessionTimeout {
+
+	private static final Logger log = LoggerFactory.getLogger(SessionTimeout.class);
 	
 	@Autowired
 	private Map<String, ClientSession> tokensMap;
@@ -31,10 +35,11 @@ public class SessionTimeout {
 					for(String token:tokensToRemove) {
 						tokensMap.remove(token);
 					}
+					log.debug("Session timeout check: {} expired, {} active", tokensToRemove.size(), tokensMap.size());
 					try {
 						Thread.sleep(1000*60);
 					} catch (Exception e) {
-						// TODO: handle exception
+						log.error("Session timeout thread interrupted: {}", e.getMessage());
 						throw new ClassCastException("You are not allowed to perform this action! ***" +e.getMessage());
 					}
 				}

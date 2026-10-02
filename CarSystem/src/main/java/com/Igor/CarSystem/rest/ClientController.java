@@ -2,6 +2,8 @@ package com.Igor.CarSystem.rest;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ import com.Igor.CarSystem.task.ClientSession;
 @RequestMapping("/client")
 public class ClientController {
 
+	private static final Logger log = LoggerFactory.getLogger(ClientController.class);
+
 	@Autowired
 	private Map<String, ClientSession> tokensMap;
 
@@ -28,6 +32,7 @@ public class ClientController {
 		if (clientSession != null && clientSession.getFacade() instanceof ClientServiceImpl) {
 			return clientSession;
 		}
+		log.info("Rejected client request: token is unknown, expired or not a client session");
 		return null;
 	}
 
@@ -42,7 +47,7 @@ public class ClientController {
 			try {
 				return new ResponseEntity<>(clientServiceImpl.getCar(id), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to get Car. Car id: {}: {}", id, e.getMessage());
 				return new ResponseEntity<>("You have no money on your account! Failed to get Car. Car id: " + id,
 						HttpStatus.BAD_REQUEST);
 			}
@@ -61,7 +66,7 @@ public class ClientController {
 			try {
 				return new ResponseEntity<>(clientServiceImpl.getCars(), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view cars by client" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view cars by client", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -79,7 +84,7 @@ public class ClientController {
 			try {
 				return new ResponseEntity<>(clientServiceImpl.getMyCars(), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view my cars" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view my cars", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -97,7 +102,7 @@ public class ClientController {
 			try {
 				return new ResponseEntity<>(clientServiceImpl.returnCar(id), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to return car" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to return car", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -115,7 +120,7 @@ public class ClientController {
 			try {
 				return new ResponseEntity<>(clientServiceImpl.getReceiptsByClient(), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view Receipts By Client. " + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view Receipts By Client. ", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -133,7 +138,7 @@ public class ClientController {
 			try {
 				return new ResponseEntity<>(clientServiceImpl.getBalance(), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed to view balance" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view balance", HttpStatus.BAD_REQUEST);
 			}
 		} else {
@@ -151,7 +156,7 @@ public class ClientController {
 			try {
 				return new ResponseEntity<>(clientServiceImpl.deleteAccount(), HttpStatus.OK);
 			} catch (Exception e) {
-				e.getMessage();
+				log.error("Failed remove account." + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed remove account.", HttpStatus.BAD_REQUEST);
 			}
 		} else {

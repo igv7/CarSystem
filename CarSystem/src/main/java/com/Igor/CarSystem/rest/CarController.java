@@ -1,5 +1,7 @@
 package com.Igor.CarSystem.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ import com.Igor.CarSystem.service.CarServiceImpl;
 @RequestMapping("/car")
 public class CarController {
 
+	private static final Logger log = LoggerFactory.getLogger(CarController.class);
+
 	@Autowired
 	private CarServiceImpl carServiceImpl;
 
@@ -24,7 +28,7 @@ public class CarController {
 		try {
 			return new ResponseEntity<>(carServiceImpl.getAllCars(), HttpStatus.OK);
 		} catch (Exception e) {
-			e.getMessage();
+			log.error("Failed to view all cars" + ": {}", e.getMessage());
 			return new ResponseEntity<>("Failed to view all cars", HttpStatus.BAD_REQUEST);
 		}
 
@@ -36,7 +40,7 @@ public class CarController {
 		try {
 			return new ResponseEntity<>(carServiceImpl.getAllCarsByType(type), HttpStatus.OK);
 		} catch (Exception e) {
-			e.getMessage();
+			log.error("Faild to get all cars by type!" + ": {}", e.getMessage());
 			return new ResponseEntity<>("Faild to get all cars by type!", HttpStatus.BAD_REQUEST);
 		}
 

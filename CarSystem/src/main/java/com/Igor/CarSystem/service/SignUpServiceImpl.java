@@ -1,5 +1,7 @@
 package com.Igor.CarSystem.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,24 +12,25 @@ import com.Igor.CarSystem.repo.ClientRepository;
 
 @Service
 public class SignUpServiceImpl implements SignUpService, Facade {
+
+	private static final Logger log = LoggerFactory.getLogger(SignUpServiceImpl.class);
 	
 	@Autowired
 	private ClientRepository clientRepository;
 
 	@Override
 	public Client signUp(Client client) throws Exception {
-		System.out.println("************************StartSignUp************************");
+		log.debug("************************StartSignUp************************");
 		try {
 			if (clientRepository.existsByName(client.getName())) {
-				System.out.println("This client name already exist in system, please try another name.");
 				throw new Exception("This client name already exist in system, please try another name.");
 			} else {
 				clientRepository.save(client);
-				System.out.println("Success on sign up: " + client.getName() + " -> " +client); 
-				System.out.println("************************EndSignUp************************");
+				log.info("Success on sign up: " + client.getName() + " -> " +client); 
+				log.debug("************************EndSignUp************************");
 			}
 		} catch (Exception e) {
-			System.out.println("Failed on sign up!");
+			log.error("Failed on sign up: {}", e.getMessage());
 			throw new Exception("Failed on sign up! " + e.getMessage());
 		}
 		return client;
