@@ -1,5 +1,6 @@
 package com.Igor.CarSystem.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,9 +32,9 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	// Client Operations
 	/**
-	 * Saves a new client. If any required field (name, birthday, password, phone, email) is missing,
-	 * nothing is saved and the client is returned as given.
-	 * @throws Exception if the name is already taken
+	 * Saves a new client. Field rules are checked by {@code @Valid} in the controller; any id or cars sent
+	 * in the body are ignored, so this always creates a new client with no rentals.
+	 * @throws Exception if the name is already taken or a required field is missing
 	 */
 	@Override
 	public Client createClient(Client client) throws Exception {
@@ -41,14 +42,14 @@ public class AdminServiceImpl implements AdminService, Facade {
 		try {
 			if (clientRepository.existsByName(client.getName())) {
 				throw new Exception("This client name already exist in system, please try another name.");
+			} else if (client.getName() == null || client.getBirthday() == null || client.getPassword() == null
+					|| client.getPhoneNumber() == null || client.getEmail() == null) {
+				throw new Exception("Missing required fields (name, birthday, password, phone, email).");
 			} else {
-				if (client.getName() != null && client.getBirthday() != null && client.getPassword() != null
-						&& client.getPhoneNumber() != null && client.getEmail() != null) {
-					clientRepository.save(client);
-					log.info("Success on create client: " + client.getName() + " -> " + client);
-				} else {
-					log.error("Client not created - missing required fields: {}", client);
-				}
+				client.setId(0);
+				client.setCars(new ArrayList<>());
+				clientRepository.save(client);
+				log.info("Success on create client: " + client.getName() + " -> " + client);
 				log.debug("************************EndCreateClient************************");
 			}
 		} catch (Exception e) {
@@ -174,9 +175,9 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	// Car Operations
 	/**
-	 * Saves a new car as available (amount = 1, whatever was sent). If the number, color, type or image
-	 * is missing, or the price is 0, nothing is saved and the car is returned as given.
-	 * @throws Exception if the number is already taken
+	 * Saves a new car as available (amount = 1, whatever was sent). Field rules are checked by
+	 * {@code @Valid} in the controller; any id sent in the body is ignored, so this always creates a new car.
+	 * @throws Exception if the number is already taken, or the number, color, type or image is missing or the price is 0
 	 */
 	@Override
 	public Car createCar(Car car) throws Exception {
@@ -184,15 +185,14 @@ public class AdminServiceImpl implements AdminService, Facade {
 		try {
 			if (carRepository.existsByNumber(car.getNumber())) {
 				throw new Exception("This car number already exist in system, please try another number.");
+			} else if (car.getNumber() == null || car.getColor() == null || car.getType() == null
+					|| car.getPrice() == 0 || car.getImage() == null) {
+				throw new Exception("Missing required fields (number, color, type, price, image).");
 			} else {
+				car.setId(0);
 				car.setAmount(1);
-				if (car.getNumber() != null && car.getColor() != null && car.getType() != null
-						&& car.getPrice() != 0 && car.getImage() != null) {
-					carRepository.save(car);
-					log.info("Success on create car. Car number: " + car.getNumber() + " -> " + car);
-				} else {
-					log.error("Car not created - missing required fields: {}", car);
-				}
+				carRepository.save(car);
+				log.info("Success on create car. Car number: " + car.getNumber() + " -> " + car);
 				log.debug("************************EndCreateCar************************");
 			}
 		} catch (Exception e) {

@@ -32,10 +32,10 @@ public class ScheduledTasks {
 
 	
 	/**
-	 * Runs every 2 minutes. Each client with a positive balance pays the price of every car they rent;
+	 * Runs every 24 hours. Each client with a positive balance pays the price of every car they rent;
 	 * each client with a balance of 0 or less has all their rented cars returned.
 	 */
-	@Scheduled(fixedRate = 1000 * 60 * 2) //1000 * 60 * 60 * 24
+	@Scheduled(fixedRate = 1000 * 60 * 60 * 24) //1000 * 60 * 60 * 24 //1000 * 60 * 2
 	public void reportCurrentTime() {
 		log.debug("Billing job started at {}", dateFormat.format(new Date()));
 		List<Client> clients = clientRepository.findAll();

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import javax.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,12 +32,12 @@ public class SignUpController {
 	 * @return 200 with the saved client, or 400 if the name is taken or saving fails
 	 */
 	@PostMapping("/signUp")
-	public ResponseEntity<?> signUp(@RequestBody Client client) {
+	public ResponseEntity<?> signUp(@Valid @RequestBody Client client) {
 		try {
 			return new ResponseEntity<>(signUpServiceImpl.signUp(client), HttpStatus.OK);
 		} catch (Exception e) {
 			log.error("Failed on sign up!" + ": {}", e.getMessage());
-			return new ResponseEntity<>("Failed on sign up!", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 

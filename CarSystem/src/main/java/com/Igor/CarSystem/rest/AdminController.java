@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import javax.validation.Valid;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,7 +63,7 @@ public class AdminController {
 	 * @return 200 with the client (not saved if required fields are missing), or 400 if the name is taken
 	 */
 	@PostMapping("/addClient/{token}")
-	public ResponseEntity<?> createClient(@RequestBody Client client, @PathVariable("token") String token) {
+	public ResponseEntity<?> createClient(@Valid @RequestBody Client client, @PathVariable("token") String token) {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
@@ -70,7 +71,7 @@ public class AdminController {
 				return new ResponseEntity<>(adminServiceImpl.createClient(client), HttpStatus.OK);
 			} catch (Exception e) {
 				log.error("Failed to add client by admin" + ": {}", e.getMessage());
-				return new ResponseEntity<>("Failed to add client by admin", HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
@@ -82,7 +83,7 @@ public class AdminController {
 	 * The client is identified by the {@code id} inside the body; the {@code id} path variable is not used.
 	 */
 	@PutMapping("/updateClient/{token}/{id}")
-	public ResponseEntity<?> updateClient(@RequestBody Client client, @PathVariable("token") String token,
+	public ResponseEntity<?> updateClient(@Valid @RequestBody Client client, @PathVariable("token") String token,
 			@PathVariable int id) {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
@@ -91,7 +92,7 @@ public class AdminController {
 				return new ResponseEntity<>(adminServiceImpl.updateClient(client), HttpStatus.OK);
 			} catch (Exception e) {
 				log.error("Failed to update client by admin" + ": {}", e.getMessage());
-				return new ResponseEntity<>("Failed to update client by admin", HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
@@ -157,7 +158,7 @@ public class AdminController {
 	 * @return 200 with the car (always created available, amount = 1; not saved if a field is missing or the price is 0), or 400 if the number is taken
 	 */
 	@PostMapping("/addCar/{token}")
-	public ResponseEntity<?> createCar(@RequestBody Car car, @PathVariable("token") String token) {
+	public ResponseEntity<?> createCar(@Valid @RequestBody Car car, @PathVariable("token") String token) {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
@@ -165,7 +166,7 @@ public class AdminController {
 				return new ResponseEntity<>(adminServiceImpl.createCar(car), HttpStatus.OK);
 			} catch (Exception e) {
 				log.error("Failed to add car by admin" + ": {}", e.getMessage());
-				return new ResponseEntity<>("Failed to add car by admin", HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
@@ -177,7 +178,7 @@ public class AdminController {
 	 * The car is identified by the {@code id} inside the body; the {@code id} path variable is not used.
 	 */
 	@PutMapping("/updateCar/{token}/{id}")
-	public ResponseEntity<?> updateCar(@RequestBody Car car, @PathVariable("token") String token,
+	public ResponseEntity<?> updateCar(@Valid @RequestBody Car car, @PathVariable("token") String token,
 			@PathVariable("id") int id) {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
@@ -186,7 +187,7 @@ public class AdminController {
 				return new ResponseEntity<>(adminServiceImpl.updateCar(car), HttpStatus.OK);
 			} catch (Exception e) {
 				log.error("Failed to update car by admin" + ": {}", e.getMessage());
-				return new ResponseEntity<>("Failed to update car by admin", HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
