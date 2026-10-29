@@ -115,20 +115,16 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return temp;
 	}
 
-	/** @throws Exception if there are no clients */
+	/** Returns an empty list when there are none. */
 	@Override
 	public List<Client> getAllClients() throws Exception {
 		log.debug("************************StartGetAllClientsById************************");
 		List<Client> clients = null;
 		try {
-			if (clientRepository.findAll().isEmpty()) {
-				throw new Exception("Cannot get all clients. The list is empty!");
-			} else {
-				clients = clientRepository.findAll();
-				log.debug("Success on get All Clients: " + clients);
-				log.debug("************************EndGetAllClientsById************************");
-				return clients;
-			}
+			clients = clientRepository.findAll();
+			log.debug("Success on get All Clients: " + clients);
+			log.debug("************************EndGetAllClientsById************************");
+			return clients;
 		} catch (Exception e) {
 			log.error("Failed to get all clients" + ": {}", e.getMessage());
 			throw new Exception("Failed to get all clients");
@@ -283,20 +279,16 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return temp;
 	}
 
-	/** @throws Exception if there are no cars */
+	/** Returns an empty list when there are none. */
 	@Override
 	public List<Car> getAllCars() throws Exception {
 		log.debug("************************StartGetAllCars************************");
 		List<Car> cars = null;
 		try {
-			if (carRepository.findAll().isEmpty()) {
-				throw new Exception("Cannot get all cars. The list is empty!");
-			} else {
-				cars = carRepository.findAll();
-				log.debug("Success on get all Cars: " + cars);
-				log.debug("************************EndGetAllCars************************");
-				return cars;
-			}
+			cars = carRepository.findAll();
+			log.debug("Success on get all Cars: " + cars);
+			log.debug("************************EndGetAllCars************************");
+			return cars;
 		} catch (Exception e) {
 			log.error("Failed to get all cars" + ": {}", e.getMessage());
 			throw new Exception("Failed to get all cars");
@@ -372,19 +364,15 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	/** @throws Exception if there are no cars at all */
+	/** Returns an empty list when there are none. */
 	public List<Car> getAllCarsByType(CarType type) throws Exception {
 		log.debug("************************StartGetAllCarsByType************************");
 		List<Car> cars = null;
 		try {
-			if (carRepository.findAll().isEmpty()) {
-				throw new Exception("Cannot get all cars. The list is empty!");
-			} else {
-				cars = carRepository.findAllByType(type);
-				log.debug("Success on get all Cars by type " + type + ": " + cars);
-				log.debug("************************EndGetAllCarsByType************************");
-				return cars;
-			}
+			cars = carRepository.findAllByType(type);
+			log.debug("Success on get all Cars by type " + type + ": " + cars);
+			log.debug("************************EndGetAllCarsByType************************");
+			return cars;
 		} catch (Exception e) {
 			log.error("Failed to get all cars by type " + type + ": {}", e.getMessage());
 			throw new Exception("Failed to get all cars by type " + type);
@@ -392,19 +380,15 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	/** @throws Exception if there are no cars at all */
+	/** Returns an empty list when there are none. */
 	public List<Car> getAllCarsByColor(CarColor color) throws Exception {
 		log.debug("************************StartGetAllCarsByColor************************");
 		List<Car> cars = null;
 		try {
-			if (carRepository.findAll().isEmpty()) {
-				throw new Exception("Cannot get all cars. The list is empty!");
-			} else {
-				cars = carRepository.findAllByColor(color);
-				log.debug("Success on get all Cars by color " + color + ": " + cars);
-				log.debug("************************EndGetAllCarsByColor************************");
-				return cars;
-			}
+			cars = carRepository.findAllByColor(color);
+			log.debug("Success on get all Cars by color " + color + ": " + cars);
+			log.debug("************************EndGetAllCarsByColor************************");
+			return cars;
 		} catch (Exception e) {
 			log.error("Failed to get all cars by color " + color + ": {}", e.getMessage());
 			throw new Exception("Failed to get all cars by color " + color);
@@ -444,21 +428,17 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return temp;
 	}
 
-	/** @throws Exception if the client rents no cars */
+	/** Returns an empty list when the client rents no cars. */
 	public List<Car> getAllClientCars(int clientId) throws Exception {
 		log.debug("************************StartGetAllClientCars************************");
 		Client client = clientRepository.findById(clientId).get();
 		List<Car> cars = null;
 		try {
-			if (client.getCars().isEmpty()) {
-				throw new Exception("Admin failed to get all " + client.getName() + "'s cars. Cars do not exist.");
-			} else {
-				cars = carRepository.findClientCar(client.getId());
-				log.debug(
-						"Success on get all Client Cars. Client name: " + client.getName() + ", cars: " + cars);
-				log.debug("************************EndGetAllClientCars************************");
-				return cars;
-			}
+			cars = carRepository.findClientCar(client.getId());
+			log.debug(
+					"Success on get all Client Cars. Client name: " + client.getName() + ", cars: " + cars);
+			log.debug("************************EndGetAllClientCars************************");
+			return cars;
 		} catch (Exception e) {
 			log.error("Admin failed to get all client cars: " + cars + ": {}", e.getMessage());
 			throw new Exception("Admin failed to get all client cars: " + cars);
@@ -466,22 +446,17 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	/** @throws Exception if the client rents no cars */
+	/** Returns an empty list when the client rents no cars. */
 	public List<Car> getAllClientCarsByType(int clientId, CarType type) throws Exception {
 		log.debug("************************StartGetAllClientCarsByType************************");
 		Client client = clientRepository.findById(clientId).get();
 		List<Car> cars = null;
 		try {
-			if (client.getCars().isEmpty()) {
-				throw new Exception("Admin failed to get all " + client.getName() + "'s cars by type " + type
-						+ ". Cars do not exist");
-			} else {
-				cars = carRepository.findClientCarByType(client.getId(), type);
-				log.debug("Success on get all Client Cars by type. Client name: " + client.getName()
-						+ ", car type: " + type + ": " + cars);
-				log.debug("************************EndGetAllClientCarsByType************************");
-				return cars;
-			}
+			cars = carRepository.findClientCarByType(client.getId(), type);
+			log.debug("Success on get all Client Cars by type. Client name: " + client.getName()
+					+ ", car type: " + type + ": " + cars);
+			log.debug("************************EndGetAllClientCarsByType************************");
+			return cars;
 		} catch (Exception e) {
 			log.error("Admin failed to get all client cars by type " + type + ": {}", e.getMessage());
 			throw new Exception("Admin failed to get all client cars by type " + type);
@@ -489,22 +464,17 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	/** @throws Exception if the client rents no cars */
+	/** Returns an empty list when the client rents no cars. */
 	public List<Car> getAllClientCarsByColor(int clientId, CarColor color) throws Exception {
 		log.debug("************************StartGetAllClientCarsByColor************************");
 		Client client = clientRepository.findById(clientId).get();
 		List<Car> cars = null;
 		try {
-			if (client.getCars().isEmpty()) {
-				throw new Exception("Admin failed to get all " + client.getName() + " cars by color " + color
-						+ ". Cars do not exist");
-			} else {
-				cars = carRepository.findClientCarByColor(client.getId(), color);
-				log.debug("Success on get all Client Cars by color. Client name: " + client.getName()
-						+ ", car color: " + color + ": " + cars);
-				log.debug("************************EndGetAllClientCarsByColor************************");
-				return cars;
-			}
+			cars = carRepository.findClientCarByColor(client.getId(), color);
+			log.debug("Success on get all Client Cars by color. Client name: " + client.getName()
+					+ ", car color: " + color + ": " + cars);
+			log.debug("************************EndGetAllClientCarsByColor************************");
+			return cars;
 		} catch (Exception e) {
 			log.error("Admin failed to get all client cars by color " + color + ": {}", e.getMessage());
 			throw new Exception("Admin failed to get all client cars by color " + color);
@@ -514,23 +484,18 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	/**
 	 * Cars rented by the client costing at most {@code price}.
-	 * @throws Exception if the client rents no cars
+	 * Returns an empty list when there are none.
 	 */
 	public List<Car> getAllClientCarsByPrice(int clientId, double price) throws Exception {
 		log.debug("************************StartGetAllClientCarsByPrice************************");
 		Client client = clientRepository.findById(clientId).get();
 		List<Car> cars = null;
 		try {
-			if (client.getCars().isEmpty()) {
-				throw new Exception("Admin failed to get all " + client.getName() + " cars by price " + price
-						+ ". Cars do not exist");
-			} else {
-				cars = carRepository.findClientCarByPrice(client.getId(), price);
-				log.debug("Success on get all Client Cars by price. Client name: " + client.getName()
-						+ ", car price until: " + price + ": " + cars);
-				log.debug("************************EndGetAllClientCarsByPrice************************");
-				return cars;
-			}
+			cars = carRepository.findClientCarByPrice(client.getId(), price);
+			log.debug("Success on get all Client Cars by price. Client name: " + client.getName()
+					+ ", car price until: " + price + ": " + cars);
+			log.debug("************************EndGetAllClientCarsByPrice************************");
+			return cars;
 		} catch (Exception e) {
 			log.error("Admin failed to get all client cars by price until " + price + ": {}", e.getMessage());
 			throw new Exception("Admin failed to get all client cars by price until " + price);

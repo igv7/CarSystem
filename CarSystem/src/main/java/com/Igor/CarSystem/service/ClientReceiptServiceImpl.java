@@ -47,19 +47,15 @@ public class ClientReceiptServiceImpl implements ClientReceiptService, Facade {
 
 	}
 
-	/** @throws Exception if there are no receipts */
+	/** Returns an empty list when there are none. */
 	public List<ClientReceipt> getAllReceipts() throws Exception {
 		log.debug("************************StartGetAllReceipts************************");
 		List<ClientReceipt> receipts = null;
 		try {
-			if (clientReceiptRepository.findAll().isEmpty()) {
-				throw new Exception("Failed to get all receipts! Data is empty.");
-			} else {
-				receipts = clientReceiptRepository.findAll();
-				log.debug("Success on get all receipts: " + receipts);
-				log.debug("************************EndGetAllReceipts************************");
-				return receipts;
-			}
+			receipts = clientReceiptRepository.findAll();
+			log.debug("Success on get all receipts: " + receipts);
+			log.debug("************************EndGetAllReceipts************************");
+			return receipts;
 		} catch (Exception e) {
 			log.error("Failed to get all receipts " + e.getMessage());
 			throw new Exception("Failed to get all receipts " + e.getMessage());
@@ -68,21 +64,17 @@ public class ClientReceiptServiceImpl implements ClientReceiptService, Facade {
 
 	/**
 	 * All receipts of client {@code clientId}.
-	 * @throws Exception if the client has no receipts
+	 * Returns an empty list when there are none.
 	 */
 	public List<ClientReceipt> getReceiptsByClient(int clientId) throws Exception {
 		log.debug("************************StartGetReceiptsByClient************************");
 		Client client = clientRepository.findById(clientId).get();
 		List<ClientReceipt> receiptsByClient = null;
 		try {
-			if (clientReceiptRepository.findAllByClientId(client.getId()).isEmpty()) {
-				throw new Exception("Failed to get all receipts by client! Data is empty.");
-			} else {
-				receiptsByClient = clientReceiptRepository.findAllByClientId(client.getId());
-				log.debug("Success on get receipts by Client " + client.getName() + ": " + receiptsByClient);
-				log.debug("************************EndGetReceiptsByClient************************");
-				return receiptsByClient;
-			}
+			receiptsByClient = clientReceiptRepository.findAllByClientId(client.getId());
+			log.debug("Success on get receipts by Client " + client.getName() + ": " + receiptsByClient);
+			log.debug("************************EndGetReceiptsByClient************************");
+			return receiptsByClient;
 		} catch (Exception e) {
 			log.error("Failed to get all receipts by client " + e.getMessage());
 			throw new Exception("Failed to get all receipts by client " + e.getMessage());

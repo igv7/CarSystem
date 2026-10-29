@@ -20,20 +20,16 @@ public class CarServiceImpl implements CarService, Facade {
 	@Autowired
 	private CarRepository carRepository;
 
-	/** @throws Exception if there are no cars */
+	/** Returns an empty list when there are none. */
 	@Override
 	public List<Car> getAllCars() throws Exception {
 		log.debug("************************StartGetAllCars************************");
 		List<Car> cars = null;
 		try {
-			if (carRepository.findAll().isEmpty()) {
-				throw new Exception("Cannot get all cars. The list is empty!");
-			} else {
-				cars = carRepository.findAll();
-				log.debug("Success on get all Cars: " + cars);
-				log.debug("************************EndGetAllCars************************");
-				return cars;
-			}
+			cars = carRepository.findAll();
+			log.debug("Success on get all Cars: " + cars);
+			log.debug("************************EndGetAllCars************************");
+			return cars;
 		} catch (Exception e) {
 			log.error("Failed to get all cars" + ": {}", e.getMessage());
 			throw new Exception("Failed to get all cars");
@@ -41,20 +37,16 @@ public class CarServiceImpl implements CarService, Facade {
 
 	}
 
-	/** @throws Exception if there are no cars at all */
+	/** Returns an empty list when there are none. */
 	@Override
 	public List<Car> getAllCarsByType(CarType type) throws Exception {
 		log.debug("************************StartGetAllCarsByType************************");
 		List<Car> cars = null;
 		try {
-			if (carRepository.findAll().isEmpty()) {
-				throw new Exception("Cannot get all cars. The list is empty!");
-			} else {
-				cars = carRepository.findAllByType(type);
-				log.debug("Success on get all Cars by type " + type + ": " + cars);
-				log.debug("************************EndGetAllCarsByType************************");
-				return cars;
-			}
+			cars = carRepository.findAllByType(type);
+			log.debug("Success on get all Cars by type " + type + ": " + cars);
+			log.debug("************************EndGetAllCarsByType************************");
+			return cars;
 		} catch (Exception e) {
 			log.error("Failed to get all cars by type " + type + ": {}", e.getMessage());
 			throw new Exception("Failed to get all cars by type " + type);

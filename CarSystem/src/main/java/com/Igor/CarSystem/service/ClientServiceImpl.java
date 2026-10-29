@@ -119,20 +119,16 @@ public class ClientServiceImpl implements ClientService, Facade {
 		return null;
 	}
 
-	/** @throws Exception if there are no cars */
+	/** Returns an empty list when there are none. */
 	@Override
 	public List<Car> getCars() throws Exception {
 		log.debug("************************StartGetCars************************");
 		List<Car> cars = null;
 		try {
-			if (carRepository.findAll().isEmpty()) {
-				throw new Exception("Cannot get cars. The list is empty!");
-			} else {
-				cars = carRepository.findAll();
-				log.debug("Success on get Cars: " + cars);
-				log.debug("************************EndGetCars************************");
-				return cars;
-			}
+			cars = carRepository.findAll();
+			log.debug("Success on get Cars: " + cars);
+			log.debug("************************EndGetCars************************");
+			return cars;
 		} catch (Exception e) {
 			log.error("Failed to get all cars" + ": {}", e.getMessage());
 			throw new Exception("Failed to get all cars");
@@ -141,22 +137,17 @@ public class ClientServiceImpl implements ClientService, Facade {
 
 	/**
 	 * Cars this client currently rents.
-	 * @throws Exception if the client rents no cars
+	 * Returns an empty list when there are none.
 	 */
 	public List<Car> getMyCars() throws Exception {
 		log.debug("************************StartGetMyCars************************");
 		Client client = clientRepository.findById(clientId).get();
 		List<Car> myCars = null;
 		try {
-			if (carRepository.findClientCar(client.getId()).isEmpty()) {
-				throw new Exception("Failed to get My Cars. Client name: " + client.getName() + ", Cars: " + myCars
-						+ " Data is empty.");
-			} else {
-				myCars = carRepository.findClientCar(client.getId());
-				log.debug("Success on get My Cars. Client name: " + client.getName() + ", Cars: " + myCars);
-				log.debug("************************EndGetMyCars************************");
-				return myCars;
-			}
+			myCars = carRepository.findClientCar(client.getId());
+			log.debug("Success on get My Cars. Client name: " + client.getName() + ", Cars: " + myCars);
+			log.debug("************************EndGetMyCars************************");
+			return myCars;
 		} catch (Exception e) {
 			log.error("Failed to get all My Cars " + myCars + ": {}", e.getMessage());
 			throw new Exception("Failed to get all My Cars " + myCars);
@@ -196,21 +187,17 @@ public class ClientServiceImpl implements ClientService, Facade {
 
 	/**
 	 * This client's receipts.
-	 * @throws Exception if the client has no receipts
+	 * Returns an empty list when there are none.
 	 */
 	public List<ClientReceipt> getReceiptsByClient() throws Exception {
 		log.debug("************************StartGetReceiptsByClient************************");
 		Client client = clientRepository.findById(clientId).get();
 		List<ClientReceipt> receiptsByClient = null;
 		try {
-			if (clientReceiptRepository.findAllByClientId(client.getId()).isEmpty()) {
-				throw new Exception("Failed to get all receipts by client! Data is empty.");
-			} else {
-				receiptsByClient = clientReceiptRepository.findAllByClientId(client.getId());
-				log.debug("Success on get receipts by Client " + client.getName() + ": " + receiptsByClient);
-				log.debug("************************EndGetReceiptsByClient************************");
-				return receiptsByClient;
-			}
+			receiptsByClient = clientReceiptRepository.findAllByClientId(client.getId());
+			log.debug("Success on get receipts by Client " + client.getName() + ": " + receiptsByClient);
+			log.debug("************************EndGetReceiptsByClient************************");
+			return receiptsByClient;
 		} catch (Exception e) {
 			log.error("Failed to get all receipts by client " + e.getMessage());
 			throw new Exception("Failed to get all receipts by client " + e.getMessage());
