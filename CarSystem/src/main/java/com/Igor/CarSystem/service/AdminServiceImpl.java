@@ -17,6 +17,7 @@ import com.Igor.CarSystem.model.Car;
 import com.Igor.CarSystem.model.Client;
 import com.Igor.CarSystem.repo.CarRepository;
 import com.Igor.CarSystem.repo.ClientRepository;
+import com.Igor.CarSystem.utils.Constants;
 
 /** Admin operations. A single shared instance; it is the {@link Facade} stored in every admin session. */
 @Service
@@ -152,7 +153,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 			} else {
 				temp = optional.get();
 				for (Car car : temp.getCars()) {
-					car.setAmount(1);
+					car.setAmount(Constants.CAR_AVAILABLE);
 					carRepository.save(car);
 				}
 				carRepository.saveAll(cars);
@@ -190,7 +191,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 				throw new Exception("Missing required fields (number, color, type, price, image).");
 			} else {
 				car.setId(0);
-				car.setAmount(1);
+				car.setAmount(Constants.CAR_AVAILABLE);
 				carRepository.save(car);
 				log.info("Success on create car. Car number: " + car.getNumber() + " -> " + car);
 				log.debug("************************EndCreateCar************************");
@@ -214,7 +215,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 			Optional<Car> optional = carRepository.findById(car.getId());
 			if (!optional.isPresent()) {
 				throw new Exception("Car doesn't exist");
-			} else if (car.getAmount() != 0 && car.getAmount() != 1) {
+			} else if (car.getAmount() != Constants.CAR_RENTED && car.getAmount() != Constants.CAR_AVAILABLE) {
 				throw new Exception("Car amount must be 0 (rented) or 1 (available), got " + car.getAmount());
 			} else {
 				temp = optional.get();
@@ -353,7 +354,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 			} else {
 				temp = optional.get();
 				if (client != null) {
-					temp.setAmount(1);
+					temp.setAmount(Constants.CAR_AVAILABLE);
 					carRepository.save(temp);
 					client.getCars().remove(temp);
 					clientRepository.save(client);

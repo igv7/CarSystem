@@ -40,12 +40,15 @@ public class LoginController {
 	 *
 	 * @param userName admin or client name
 	 * @param password password
-	 * @param type "ADMIN" or "CLIENT"
+	 * @param type a {@link ClientType} name: "ADMIN" or "CLIENT"
 	 * @return 200 with the token, or 401 with the reason
 	 */
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestParam String userName, @RequestParam String password, @RequestParam String type) {
-		if (!type.equals("ADMIN") && !type.equals("CLIENT")) {
+		ClientType clientType;
+		try {
+			clientType = ClientType.valueOf(type);
+		} catch (IllegalArgumentException e) {
 			log.info("Login rejected for user '{}': wrong type '{}'", userName, type);
 			return new ResponseEntity<>("Wrong type", HttpStatus.UNAUTHORIZED);
 		}
@@ -54,7 +57,7 @@ public class LoginController {
 		String token = UUID.randomUUID().toString();
 		long LastAccsessed = System.currentTimeMillis();
 		try {
-			facade = carSystem.login(userName, password, ClientType.valueOf(type));
+			facade = carSystem.login(userName, password, clientType);
 			clientSession.setFacade(facade);
 			clientSession.setLastAccessed(LastAccsessed);
 			tokensMap.put(token, clientSession);

@@ -6,6 +6,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,14 @@ public class CarSystem {
 	@Autowired
 	private ClientRepository clientRepository;
 
-		
+	/** Admin login name, from {@code carsystem.admin.username}. */
+	@Value("${carsystem.admin.username}")
+	private String adminUsername;
+
+	/** Admin login password, from {@code carsystem.admin.password}. */
+	@Value("${carsystem.admin.password}")
+	private String adminPassword;
+
 
 	/** Runs at startup: starts the session-timeout thread. */
 	@PostConstruct
@@ -55,7 +63,7 @@ public class CarSystem {
 
 	/**
 	 * Checks credentials and returns the service the user will work with.
-	 * The admin account is hard-coded as admin / 1234. A client gets a new {@link ClientServiceImpl}
+	 * The admin credentials come from {@code carsystem.admin.*} in application.properties. A client gets a new {@link ClientServiceImpl}
 	 * bound to their ID.
 	 *
 	 * @return {@link AdminServiceImpl} for the admin, a new {@link ClientServiceImpl} for a client
@@ -64,7 +72,7 @@ public class CarSystem {
 	public Facade login(String userName, String password, ClientType type) throws Exception {
 		switch (type) {
 		case ADMIN:
-			if (userName.equals("admin") && password.equals("1234")) {
+			if (userName.equals(adminUsername) && password.equals(adminPassword)) {
 				log.info("Welcome Admin! You're logged into The Car System");
 				return adminServiceImpl;
 			}

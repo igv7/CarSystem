@@ -3,21 +3,34 @@ package com.Igor.CarSystem.task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/** Background thread that removes sessions idle for more than 30 minutes, checking once a minute. */
+/**
+ * Background thread that removes idle sessions. The idle limit and check interval come from
+ * {@code carsystem.session.*} in application.properties.
+ */
 @Component
 public class SessionTimeout {
 
 	private static final Logger log = LoggerFactory.getLogger(SessionTimeout.class);
-	
+
 	@Autowired
 	private Map<String, ClientSession> tokensMap;
-	
+
+	/** Sessions idle longer than this many minutes are removed ({@code carsystem.session.timeout-minutes}). */
+	@Value("${carsystem.session.timeout-minutes}")
+	private long timeoutMinutes;
+
+	/** Seconds between two cleanup runs ({@code carsystem.session.check-interval-seconds}). */
+	@Value("${carsystem.session.check-interval-seconds}")
+	private long checkIntervalSeconds;
+
 	/** Set by {@link #stop()} to end the thread after its current sleep. */
 	private boolean stop = false;
 	
@@ -31,7 +44,7 @@ public class SessionTimeout {
 			public void run() {
 				while(!stop) {
 					for(Map.Entry<String, ClientSession> e:tokensMap.entrySet()) {
-						if (System.currentTimeMillis()-e.getValue().getLastAccessed()>1000*60*30) {
+						if (System.currentTimeMillis()-e.getValue().getLastAccessed()>TimeUnit.MINUTES.toMillis(timeoutMinutes)) {
 							tokensToRemove.add(e.getKey());
 						}
 					}
@@ -40,7 +53,7 @@ public class SessionTimeout {
 					}
 					log.debug("Session timeout check: {} expired, {} active", tokensToRemove.size(), tokensMap.size());
 					try {
-						Thread.sleep(1000*60);
+						Thread.sleep(TimeUnit.SECONDS.toMillis(checkIntervalSeconds));
 					} catch (Exception e) {
 						log.error("Session timeout thread interrupted: {}", e.getMessage());
 						throw new ClassCastException("You are not allowed to perform this action! ***" +e.getMessage());

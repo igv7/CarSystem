@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.Igor.CarSystem.model.Client;
@@ -21,8 +22,12 @@ public class SignUpServiceImpl implements SignUpService, Facade {
 	@Autowired
 	private ClientRepository clientRepository;
 
-	/** Highest starting balance a client may give themselves at sign-up (the administration's gift). */
-	private static final double MAX_SIGN_UP_BALANCE = 100;
+	/**
+	 * Highest starting balance a client may give themselves at sign-up (the administration's gift),
+	 * from {@code carsystem.signup.max-balance}.
+	 */
+	@Value("${carsystem.signup.max-balance}")
+	private double maxSignUpBalance;
 
 	/**
 	 * Saves the client as a new account. Field rules are checked by {@code @Valid} in the controller; this
@@ -35,8 +40,8 @@ public class SignUpServiceImpl implements SignUpService, Facade {
 	public Client signUp(Client client) throws Exception {
 		log.debug("************************StartSignUp************************");
 		try {
-			if (client.getBalance() > MAX_SIGN_UP_BALANCE) {
-				throw new Exception("The starting balance can be at most " + (int) MAX_SIGN_UP_BALANCE + ".");
+			if (client.getBalance() > maxSignUpBalance) {
+				throw new Exception("The starting balance can be at most " + (int) maxSignUpBalance + ".");
 			} else if (clientRepository.existsByName(client.getName())) {
 				throw new Exception("This client name already exist in system, please try another name.");
 			} else {

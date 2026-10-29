@@ -19,6 +19,7 @@ import javax.validation.constraints.Size;
 
 import com.Igor.CarSystem.enums.CarColor;
 import com.Igor.CarSystem.enums.CarType;
+import com.Igor.CarSystem.utils.Constants;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -61,8 +62,8 @@ public class Car {
 	 * Availability of this single car: 1 = available, 0 = rented. createCar always sets 1,
 	 * renting sets 0, every return sets 1, and updateCar rejects any other value.
 	 */
-	@Min(value = 0, message = "must be 0 (rented) or 1 (available)")
-	@Max(value = 1, message = "must be 0 (rented) or 1 (available)")
+	@Min(value = Constants.CAR_RENTED, message = "must be 0 (rented) or 1 (available)")
+	@Max(value = Constants.CAR_AVAILABLE, message = "must be 0 (rented) or 1 (available)")
 	@Column(name = "AMOUNT")
 	private int amount;
 
@@ -75,7 +76,7 @@ public class Car {
 	/** Image URL or path shown by the frontend. */
 	@NotBlank(message = "is required")
 	@Size(max = 255, message = "must be at most 255 characters")
-	@Pattern(regexp = "[^<>]*", message = "must not contain < or >")
+	@Pattern(regexp = Constants.NO_HTML_REGEX, message = "must not contain < or >")
 	@Column(name = "IMAGE")
 	private String image;
 

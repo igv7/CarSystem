@@ -21,6 +21,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.Igor.CarSystem.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -51,13 +52,13 @@ public class Client {
 	/** Login name; unique. Angle brackets are rejected so a name can never carry HTML. */
 	@NotBlank(message = "is required")
 	@Size(min = 2, max = 30, message = "must be 2-30 characters")
-	@Pattern(regexp = "[^<>]*", message = "must not contain < or >")
+	@Pattern(regexp = Constants.NO_HTML_REGEX, message = "must not contain < or >")
 	@Column(name = "NAME")
 	private String name;
 
 	/** Date of birth as yyyy-MM-dd text (column DOB). */
 	@NotBlank(message = "is required")
-	@Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "must have the format yyyy-MM-dd")
+	@Pattern(regexp = Constants.DATE_REGEX, message = "must have the format " + Constants.DATE_PATTERN)
 	@Column(name = "DOB")
 	private String birthday;
 
@@ -106,7 +107,7 @@ public class Client {
 	@JsonIgnore
 	@AssertTrue(message = "birthday must be a date between 1900-01-01 and today")
 	public boolean isBirthdayInRange() {
-		if (birthday == null || !birthday.matches("\\d{4}-\\d{2}-\\d{2}")) {
+		if (birthday == null || !birthday.matches(Constants.DATE_REGEX)) {
 			return true;
 		}
 		try {

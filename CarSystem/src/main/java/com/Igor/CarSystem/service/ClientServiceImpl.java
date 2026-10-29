@@ -16,6 +16,7 @@ import com.Igor.CarSystem.model.ClientReceipt;
 import com.Igor.CarSystem.repo.CarRepository;
 import com.Igor.CarSystem.repo.ClientReceiptRepository;
 import com.Igor.CarSystem.repo.ClientRepository;
+import com.Igor.CarSystem.utils.Constants;
 import com.Igor.CarSystem.utils.DateFormatter;
 
 /**
@@ -66,11 +67,11 @@ public class ClientServiceImpl implements ClientService, Facade {
 			car = optional.get();
 			log.debug("This car to get: " + car);
 
-			if (client.getBalance() <= -1.0) {
+			if (client.getBalance() <= Constants.RENT_BLOCKED_AT_BALANCE) {
 				throw new Exception("Your balance is in the red! Please replenish your account.");
 			}
 
-			if (car.getAmount() <= 0) {
+			if (car.getAmount() != Constants.CAR_AVAILABLE) {
 				throw new Exception("Client failed to get car - wrong amount: " + car.getAmount());
 			}
 
@@ -82,9 +83,9 @@ public class ClientServiceImpl implements ClientService, Facade {
 
 			if (optional.isPresent()) {
 				car = carRepository.getOne(id);
-				if (car.getAmount() > 0) {
+				if (car.getAmount() == Constants.CAR_AVAILABLE) {
 					client = clientRepository.getOne(clientId);
-					car.setAmount(0);
+					car.setAmount(Constants.CAR_RENTED);
 					client.getCars().add(car);
 					client.setBalance(client.getBalance() - car.getPrice());
 					clientRepository.save(client);
@@ -180,7 +181,7 @@ public class ClientServiceImpl implements ClientService, Facade {
 				car = rented.get();
 				client.getCars().remove(car);
 				clientRepository.save(client);
-				car.setAmount(1);
+				car.setAmount(Constants.CAR_AVAILABLE);
 				carRepository.save(car);
 				log.info("Success on return Car. Client name: " + client.getName() + ", Car: " + car);
 				log.debug("************************EndReturnCar************************");
@@ -259,7 +260,7 @@ public class ClientServiceImpl implements ClientService, Facade {
 			} else {
 				temp = optional.get();
 				for (Car car : temp.getCars()) {
-					car.setAmount(1);
+					car.setAmount(Constants.CAR_AVAILABLE);
 					carRepository.save(car);
 				}
 				carRepository.saveAll(cars);
