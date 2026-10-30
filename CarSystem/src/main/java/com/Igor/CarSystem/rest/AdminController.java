@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.Igor.CarSystem.enums.CarColor;
 import com.Igor.CarSystem.enums.CarType;
+import com.Igor.CarSystem.exceptions.ClientDoesntExist;
 import com.Igor.CarSystem.model.Car;
 import com.Igor.CarSystem.model.Client;
 import com.Igor.CarSystem.service.AdminServiceImpl;
@@ -325,6 +326,9 @@ public class AdminController {
 			clientSession.setLastAccessed(System.currentTimeMillis());
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getClientCarByNumber(id, number), HttpStatus.OK);
+			} catch (ClientDoesntExist e) {
+				log.error("Failed to view Client car by admin" + ": {}", e.getMessage());
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 			} catch (Exception e) {
 				log.error("Failed to view Client car by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view Client car by admin", HttpStatus.BAD_REQUEST);
@@ -342,6 +346,9 @@ public class AdminController {
 			clientSession.setLastAccessed(System.currentTimeMillis());
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllClientCars(id), HttpStatus.OK);
+			} catch (ClientDoesntExist e) {
+				log.error("Failed to view all Client cars by admin" + ": {}", e.getMessage());
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 			} catch (Exception e) {
 				log.error("Failed to view all Client cars by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view all Client cars by admin", HttpStatus.BAD_REQUEST);
@@ -360,6 +367,9 @@ public class AdminController {
 			clientSession.setLastAccessed(System.currentTimeMillis());
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllClientCarsByType(id, type), HttpStatus.OK);
+			} catch (ClientDoesntExist e) {
+				log.error("Failed to view all Client cars by type by admin" + ": {}", e.getMessage());
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 			} catch (Exception e) {
 				log.error("Failed to view all Client cars by type by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view all Client cars by type by admin", HttpStatus.BAD_REQUEST);
@@ -378,6 +388,9 @@ public class AdminController {
 			clientSession.setLastAccessed(System.currentTimeMillis());
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllClientCarsByColor(id, color), HttpStatus.OK);
+			} catch (ClientDoesntExist e) {
+				log.error("Failed to view all Client cars by color by admin" + ": {}", e.getMessage());
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 			} catch (Exception e) {
 				log.error("Failed to view all Client cars by color by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view all Client cars by color by admin", HttpStatus.BAD_REQUEST);
@@ -396,6 +409,9 @@ public class AdminController {
 			clientSession.setLastAccessed(System.currentTimeMillis());
 			try {
 				return new ResponseEntity<>(adminServiceImpl.getAllClientCarsByPrice(id, price), HttpStatus.OK);
+			} catch (ClientDoesntExist e) {
+				log.error("Failed to view all Client cars by price by admin" + ": {}", e.getMessage());
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 			} catch (Exception e) {
 				log.error("Failed to view all Client cars by price by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view all Client cars by price by admin", HttpStatus.BAD_REQUEST);
@@ -414,6 +430,9 @@ public class AdminController {
 			clientSession.setLastAccessed(System.currentTimeMillis());
 			try {
 				return new ResponseEntity<>(clientReceiptServiceImpl.getReceiptsByClient(id), HttpStatus.OK);
+			} catch (ClientDoesntExist e) {
+				log.error("Failed to view Receipts By Client id: " + id + ": {}", e.getMessage());
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 			} catch (Exception e) {
 				log.error("Failed to view Receipts By Client id: " + id + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to view Receipts By Client id: " + id, HttpStatus.BAD_REQUEST);

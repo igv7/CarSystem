@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.Igor.CarSystem.exceptions.ClientDoesntExist;
 import com.Igor.CarSystem.model.Client;
 import com.Igor.CarSystem.model.ClientReceipt;
 import com.Igor.CarSystem.repo.ClientReceiptRepository;
@@ -65,16 +66,21 @@ public class ClientReceiptServiceImpl implements ClientReceiptService, Facade {
 	/**
 	 * All receipts of client {@code clientId}.
 	 * Returns an empty list when there are none.
+	 * @throws ClientDoesntExist if no client has that ID
 	 */
 	public List<ClientReceipt> getReceiptsByClient(int clientId) throws Exception {
 		log.debug("************************StartGetReceiptsByClient************************");
-		Client client = clientRepository.findById(clientId).get();
 		List<ClientReceipt> receiptsByClient = null;
 		try {
+			Client client = clientRepository.findById(clientId)
+					.orElseThrow(() -> new ClientDoesntExist("Client id " + clientId + " doesn't exist"));
 			receiptsByClient = clientReceiptRepository.findAllByClientId(client.getId());
 			log.debug("Success on get receipts by Client " + client.getName() + ": " + receiptsByClient);
 			log.debug("************************EndGetReceiptsByClient************************");
 			return receiptsByClient;
+		} catch (ClientDoesntExist e) {
+			log.error(e.getMessage());
+			throw e;
 		} catch (Exception e) {
 			log.error("Failed to get all receipts by client " + e.getMessage());
 			throw new Exception("Failed to get all receipts by client " + e.getMessage());

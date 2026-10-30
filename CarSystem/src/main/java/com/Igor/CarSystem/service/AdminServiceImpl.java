@@ -403,9 +403,9 @@ public class AdminServiceImpl implements AdminService, Facade {
 	 */
 	public Car getClientCarByNumber(int clientId, String number) throws Exception {
 		log.debug("************************StartGetClientCarByNumber************************");
-		Client client = clientRepository.findById(clientId).get();
 		Car temp = null;
 		try {
+			Client client = findClient(clientId);
 			if (client.getCars().isEmpty()) {
 				throw new Exception("Admin failed to get " + client.getName() + "'s cars. Cars do not exist");
 			}
@@ -421,6 +421,9 @@ public class AdminServiceImpl implements AdminService, Facade {
 		} catch (CarDoesntExist e) {
 			log.error(e.getMessage());
 			;
+		} catch (ClientDoesntExist e) {
+			log.error(e.getMessage());
+			throw e;
 		} catch (Exception e) {
 			log.error("Failed to get car: " + number + ": {}", e.getMessage());
 			throw new Exception("Failed to get car: " + number);
@@ -428,17 +431,23 @@ public class AdminServiceImpl implements AdminService, Facade {
 		return temp;
 	}
 
-	/** Returns an empty list when the client rents no cars. */
+	/**
+	 * Returns an empty list when the client rents no cars.
+	 * @throws ClientDoesntExist if no client has that ID
+	 */
 	public List<Car> getAllClientCars(int clientId) throws Exception {
 		log.debug("************************StartGetAllClientCars************************");
-		Client client = clientRepository.findById(clientId).get();
 		List<Car> cars = null;
 		try {
+			Client client = findClient(clientId);
 			cars = carRepository.findClientCar(client.getId());
 			log.debug(
 					"Success on get all Client Cars. Client name: " + client.getName() + ", cars: " + cars);
 			log.debug("************************EndGetAllClientCars************************");
 			return cars;
+		} catch (ClientDoesntExist e) {
+			log.error(e.getMessage());
+			throw e;
 		} catch (Exception e) {
 			log.error("Admin failed to get all client cars: " + cars + ": {}", e.getMessage());
 			throw new Exception("Admin failed to get all client cars: " + cars);
@@ -446,17 +455,23 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	/** Returns an empty list when the client rents no cars. */
+	/**
+	 * Returns an empty list when the client rents no cars.
+	 * @throws ClientDoesntExist if no client has that ID
+	 */
 	public List<Car> getAllClientCarsByType(int clientId, CarType type) throws Exception {
 		log.debug("************************StartGetAllClientCarsByType************************");
-		Client client = clientRepository.findById(clientId).get();
 		List<Car> cars = null;
 		try {
+			Client client = findClient(clientId);
 			cars = carRepository.findClientCarByType(client.getId(), type);
 			log.debug("Success on get all Client Cars by type. Client name: " + client.getName()
 					+ ", car type: " + type + ": " + cars);
 			log.debug("************************EndGetAllClientCarsByType************************");
 			return cars;
+		} catch (ClientDoesntExist e) {
+			log.error(e.getMessage());
+			throw e;
 		} catch (Exception e) {
 			log.error("Admin failed to get all client cars by type " + type + ": {}", e.getMessage());
 			throw new Exception("Admin failed to get all client cars by type " + type);
@@ -464,17 +479,23 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	}
 
-	/** Returns an empty list when the client rents no cars. */
+	/**
+	 * Returns an empty list when the client rents no cars.
+	 * @throws ClientDoesntExist if no client has that ID
+	 */
 	public List<Car> getAllClientCarsByColor(int clientId, CarColor color) throws Exception {
 		log.debug("************************StartGetAllClientCarsByColor************************");
-		Client client = clientRepository.findById(clientId).get();
 		List<Car> cars = null;
 		try {
+			Client client = findClient(clientId);
 			cars = carRepository.findClientCarByColor(client.getId(), color);
 			log.debug("Success on get all Client Cars by color. Client name: " + client.getName()
 					+ ", car color: " + color + ": " + cars);
 			log.debug("************************EndGetAllClientCarsByColor************************");
 			return cars;
+		} catch (ClientDoesntExist e) {
+			log.error(e.getMessage());
+			throw e;
 		} catch (Exception e) {
 			log.error("Admin failed to get all client cars by color " + color + ": {}", e.getMessage());
 			throw new Exception("Admin failed to get all client cars by color " + color);
@@ -485,22 +506,35 @@ public class AdminServiceImpl implements AdminService, Facade {
 	/**
 	 * Cars rented by the client costing at most {@code price}.
 	 * Returns an empty list when there are none.
+	 * @throws ClientDoesntExist if no client has that ID
 	 */
 	public List<Car> getAllClientCarsByPrice(int clientId, double price) throws Exception {
 		log.debug("************************StartGetAllClientCarsByPrice************************");
-		Client client = clientRepository.findById(clientId).get();
 		List<Car> cars = null;
 		try {
+			Client client = findClient(clientId);
 			cars = carRepository.findClientCarByPrice(client.getId(), price);
 			log.debug("Success on get all Client Cars by price. Client name: " + client.getName()
 					+ ", car price until: " + price + ": " + cars);
 			log.debug("************************EndGetAllClientCarsByPrice************************");
 			return cars;
+		} catch (ClientDoesntExist e) {
+			log.error(e.getMessage());
+			throw e;
 		} catch (Exception e) {
 			log.error("Admin failed to get all client cars by price until " + price + ": {}", e.getMessage());
 			throw new Exception("Admin failed to get all client cars by price until " + price);
 		}
 
+	}
+
+	/**
+	 * Loads a client by ID.
+	 * @throws ClientDoesntExist if no client has that ID
+	 */
+	private Client findClient(int clientId) throws ClientDoesntExist {
+		return clientRepository.findById(clientId)
+				.orElseThrow(() -> new ClientDoesntExist("Client id " + clientId + " doesn't exist"));
 	}
 
 }
