@@ -34,7 +34,7 @@ public class SignUpServiceImpl implements SignUpService, Facade {
 	 * also caps the starting balance and ignores any id or cars sent in the body, so sign-up can't
 	 * overwrite an existing client or take over rented cars.
 	 * @return the saved client
-	 * @throws Exception if the name is already taken, the balance is above the sign-up limit, or saving fails
+	 * @throws Exception if the name or clientID is already taken, the balance is above the sign-up limit, or saving fails
 	 */
 	@Override
 	public Client signUp(Client client) throws Exception {
@@ -44,6 +44,8 @@ public class SignUpServiceImpl implements SignUpService, Facade {
 				throw new Exception("The starting balance can be at most " + (int) maxSignUpBalance + ".");
 			} else if (clientRepository.existsByName(client.getName())) {
 				throw new Exception("This client name already exist in system, please try another name.");
+			} else if (clientRepository.existsByClientID(client.getClientID())) {
+				throw new Exception("This identity number already exist in system: " + client.getClientID());
 			} else {
 				client.setId(0);
 				client.setCars(new ArrayList<>());

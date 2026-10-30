@@ -29,15 +29,26 @@ import lombok.NoArgsConstructor;
 @Component
 public class ClientReceipt {
 	
-	/** Next receipt ID. Kept in memory only, so it restarts at 1 when the application restarts. */
+	/**
+	 * Next receipt ID. Kept in memory; at startup ClientReceiptServiceImpl moves it past the highest ID already
+	 * in MongoDB (see {@link #continueAfter(long)}), so new receipts never overwrite stored ones.
+	 */
 	private static long id = 1;
 
 	/**
 	 * Returns the next receipt ID and advances the counter.
 	 * @return the receipt ID to use for a new receipt
 	 */
-	public static long incrementId() {
+	public static synchronized long incrementId() {
 		return id++;
+	}
+
+	/**
+	 * Makes the next receipt ID {@code lastId + 1}, unless the counter is already past it.
+	 * @param lastId the highest receipt ID already stored
+	 */
+	public static synchronized void continueAfter(long lastId) {
+		id = Math.max(id, lastId + 1);
 	}
 	
 	/** Mongo document ID; set from {@link #incrementId()} when the receipt is created. */
@@ -51,6 +62,12 @@ public class ClientReceipt {
 	
 //	@Field("clientName")
 	private String clientName;
+
+	/**
+	 * Copy of {@code Client.clientID}, the client's 9-digit personal identity number. Not to be confused with
+	 * {@link #clientId}, the client's database ID. Empty on receipts saved before this field existed.
+	 */
+	private String clientIdentityNumber;
 	
 //	@Field("clientPhoneNumber")
 	private String clientPhoneNumber;

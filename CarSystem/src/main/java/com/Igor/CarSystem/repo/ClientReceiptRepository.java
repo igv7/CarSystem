@@ -1,6 +1,7 @@
 package com.Igor.CarSystem.repo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
@@ -19,5 +20,8 @@ public interface ClientReceiptRepository extends MongoRepository<ClientReceipt, 
 
 	/** All receipts of the client. */
 	public List<ClientReceipt> findAllByClientId(int clientId);
+
+	/** The receipt with the highest ID, or empty if there are no receipts. */
+	public Optional<ClientReceipt> findTopByOrderByReceiptIdDesc();
 
 }

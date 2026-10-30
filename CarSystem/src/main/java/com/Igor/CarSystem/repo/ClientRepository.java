@@ -1,6 +1,7 @@
 package com.Igor.CarSystem.repo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,12 @@ public interface ClientRepository extends JpaRepository<Client, Integer> {
 	/** @return true if a client with this name exists (names act as unique usernames) */
 	public boolean existsByName(String name);
 	
+	/** @return true if a client with this clientID (personal identity number) exists */
+	public boolean existsByClientID(String clientID);
+
+	/** Finds a client by clientID (personal identity number). */
+	public Optional<Client> findByClientID(String clientID);
+
 	/** Finds a client by name, or null. */
 	public Client findByName(String name);
 	

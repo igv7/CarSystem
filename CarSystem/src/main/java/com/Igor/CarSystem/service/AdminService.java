@@ -20,6 +20,9 @@ public interface AdminService {
 	
 	/** Finds a client by ID. */
 	public Client getClientById(int id) throws Exception;
+
+	/** Finds a client by clientID (the 9-digit personal identity number). */
+	public Client getClientByClientID(String clientID) throws Exception;
 	
 	/** All clients; fails if there are none. */
 	public List<Client> getAllClients() throws Exception;

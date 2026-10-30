@@ -42,6 +42,12 @@ public final class Constants {
 
 	// Validation
 
+	/** Number of digits in {@code Client.clientID}. */
+	public static final int CLIENT_ID_LENGTH = 9;
+
+	/** {@code Client.clientID}: exactly {@link #CLIENT_ID_LENGTH} digits, nothing else. */
+	public static final String CLIENT_ID_REGEX = "\\d{" + CLIENT_ID_LENGTH + "}";
+
 	/** Text without '<' or '>', so values can't inject HTML into the frontend. */
 	public static final String NO_HTML_REGEX = "[^<>]*";
 }

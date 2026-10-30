@@ -56,6 +56,16 @@ public class Client {
 	@Column(name = "NAME")
 	private String name;
 
+	/**
+	 * The client's personal identity number: exactly 9 digits, no letters, symbols or spaces; unique.
+	 * Separate from {@link #id}, the database key, which stays the primary key. Clients created before this
+	 * field existed have it empty until an admin sets it.
+	 */
+	@NotBlank(message = "is required")
+	@Pattern(regexp = Constants.CLIENT_ID_REGEX, message = "must be exactly " + Constants.CLIENT_ID_LENGTH + " digits")
+	@Column(name = "CLIENT_ID", unique = true, length = Constants.CLIENT_ID_LENGTH)
+	private String clientID;
+
 	/** Date of birth as yyyy-MM-dd text (column DOB). */
 	@NotBlank(message = "is required")
 	@Pattern(regexp = Constants.DATE_REGEX, message = "must have the format " + Constants.DATE_PATTERN)

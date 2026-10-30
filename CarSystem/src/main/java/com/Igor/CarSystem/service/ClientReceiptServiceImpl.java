@@ -2,6 +2,8 @@ package com.Igor.CarSystem.service;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,18 @@ public class ClientReceiptServiceImpl implements ClientReceiptService, Facade {
 
 	@Autowired
 	private ClientRepository clientRepository;
-	
+
+	/**
+	 * Moves the in-memory receipt ID counter past the highest receipt ID in MongoDB. Without this the counter
+	 * restarts at 1 and new receipts would overwrite stored ones with the same ID.
+	 */
+	@PostConstruct
+	public void initReceiptIds() {
+		long lastId = clientReceiptRepository.findTopByOrderByReceiptIdDesc().map(ClientReceipt::getReceiptId).orElse(0L);
+		ClientReceipt.continueAfter(lastId);
+		log.info("Receipt IDs continue after {}", lastId);
+	}
+
 
 	/**
 	 * Saves a receipt in MongoDB.

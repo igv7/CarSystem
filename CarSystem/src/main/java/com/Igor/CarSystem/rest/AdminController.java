@@ -117,6 +117,31 @@ public class AdminController {
 		}
 	}
 
+	/**
+	 * GET /admin/viewClientByClientID/{token}/{clientID}. One client by clientID (the 9-digit personal identity
+	 * number, not the database ID).
+	 * @return 200 with the client, 404 if no client has that clientID, or 400 if it is not exactly 9 digits
+	 */
+	@GetMapping("/viewClientByClientID/{token}/{clientID}")
+	public ResponseEntity<?> getClientByClientID(@PathVariable("token") String token,
+			@PathVariable("clientID") String clientID) {
+		ClientSession clientSession = isActive(token);
+		if (clientSession != null) {
+			clientSession.setLastAccessed(System.currentTimeMillis());
+			try {
+				return new ResponseEntity<>(adminServiceImpl.getClientByClientID(clientID), HttpStatus.OK);
+			} catch (ClientDoesntExist e) {
+				log.error("Failed to view client by client ID by admin" + ": {}", e.getMessage());
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+			} catch (Exception e) {
+				log.error("Failed to view client by client ID by admin" + ": {}", e.getMessage());
+				return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			return new ResponseEntity<>("Unauthorized. Session Timeout", HttpStatus.UNAUTHORIZED);
+		}
+	}
+
 	/** GET /admin/viewAllClients/{token}. All clients, or 400 if there are none. */
 	@GetMapping("/viewAllClients/{token}")
 	public ResponseEntity<?> getAllClients(@PathVariable String token) {

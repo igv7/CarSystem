@@ -35,7 +35,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 	/**
 	 * Saves a new client. Field rules are checked by {@code @Valid} in the controller; any id or cars sent
 	 * in the body are ignored, so this always creates a new client with no rentals.
-	 * @throws Exception if the name is already taken or a required field is missing
+	 * @throws Exception if the name or clientID is already taken or a required field is missing
 	 */
 	@Override
 	public Client createClient(Client client) throws Exception {
@@ -43,9 +43,11 @@ public class AdminServiceImpl implements AdminService, Facade {
 		try {
 			if (clientRepository.existsByName(client.getName())) {
 				throw new Exception("This client name already exist in system, please try another name.");
-			} else if (client.getName() == null || client.getBirthday() == null || client.getPassword() == null
-					|| client.getPhoneNumber() == null || client.getEmail() == null) {
-				throw new Exception("Missing required fields (name, birthday, password, phone, email).");
+			} else if (clientRepository.existsByClientID(client.getClientID())) {
+				throw new Exception("This identity number already exist in system: " + client.getClientID());
+			} else if (client.getName() == null || client.getClientID() == null || client.getBirthday() == null
+					|| client.getPassword() == null || client.getPhoneNumber() == null || client.getEmail() == null) {
+				throw new Exception("Missing required fields (name, client ID, birthday, password, phone, email).");
 			} else {
 				client.setId(0);
 				client.setCars(new ArrayList<>());
@@ -62,7 +64,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 
 	/**
 	 * Copies all details from {@code client} onto the stored client with the same ID.
-	 * @throws Exception if no client has that ID
+	 * @throws Exception if no client has that ID, or another client already has the new clientID
 	 */
 	@Override
 	public Client updateClient(Client client) throws Exception {
@@ -70,11 +72,15 @@ public class AdminServiceImpl implements AdminService, Facade {
 		Client temp = null;
 		try {
 			Optional<Client> optional = clientRepository.findById(client.getId());
+			Optional<Client> sameClientID = clientRepository.findByClientID(client.getClientID());
 			if (!optional.isPresent()) {
 				throw new Exception("Client doesn't exist");
+			} else if (sameClientID.isPresent() && sameClientID.get().getId() != client.getId()) {
+				throw new Exception("This identity number already exist in system: " + client.getClientID());
 			} else {
 				temp = optional.get();
 				temp.setName(client.getName());
+				temp.setClientID(client.getClientID());
 				temp.setPassword(client.getPassword());
 				temp.setBirthday(client.getBirthday());
 				temp.setPhoneNumber(client.getPhoneNumber());
@@ -113,6 +119,32 @@ public class AdminServiceImpl implements AdminService, Facade {
 			throw new Exception("Failed to get client - this client id doesn't exist: " + id);
 		}
 		return temp;
+	}
+
+	/**
+	 * Finds a client by clientID (personal identity number), not by the database ID.
+	 * @throws ClientDoesntExist if no client has that clientID
+	 * @throws Exception if {@code clientID} is not exactly 9 digits
+	 */
+	@Override
+	public Client getClientByClientID(String clientID) throws Exception {
+		log.debug("************************StartGetClientByClientID************************");
+		try {
+			if (clientID == null || !clientID.matches(Constants.CLIENT_ID_REGEX)) {
+				throw new Exception("Identity number must be exactly " + Constants.CLIENT_ID_LENGTH + " digits: " + clientID);
+			}
+			Client temp = clientRepository.findByClientID(clientID)
+					.orElseThrow(() -> new ClientDoesntExist("No client has identity number " + clientID));
+			log.debug("Success on get Client by client ID: " + temp);
+			log.debug("************************EndGetClientByClientID************************");
+			return temp;
+		} catch (ClientDoesntExist e) {
+			log.error(e.getMessage());
+			throw e;
+		} catch (Exception e) {
+			log.error("Failed to get client by identity number: " + clientID + ": {}", e.getMessage());
+			throw new Exception(e.getMessage());
+		}
 	}
 
 	/** Returns an empty list when there are none. */
