@@ -1,6 +1,6 @@
 package com.Igor.CarSystem.config;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
@@ -24,10 +24,11 @@ public class WebConfiguration {
 	/**
 	 * In-memory session store shared by all controllers: login token -> {@link ClientSession}.
 	 * Filled by {@code LoginController}, cleaned up by {@code SessionTimeout}. Sessions are lost on restart.
+	 * Concurrent, because request threads and the cleanup thread use it at the same time.
 	 */
 	@Bean
 	public Map<String, ClientSession> tokensMap() {
-		return new HashMap<String, ClientSession>();
+		return new ConcurrentHashMap<String, ClientSession>();
 	}
 	
 	/**

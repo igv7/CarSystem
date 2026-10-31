@@ -50,6 +50,11 @@ public class ClientServiceImpl implements ClientService, Facade {
 		this.clientId = clientId;
 	}
 
+	/** ID of the client this instance acts for. */
+	public int getClientId() {
+		return clientId;
+	}
+
 	/**
 	 * Rents car {@code id}: marks it rented (amount = 0), adds it to the client's cars, subtracts its price
 	 * from the balance and stores a receipt in MongoDB.

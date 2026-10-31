@@ -161,14 +161,21 @@ public class AdminController {
 		}
 	}
 
-	/** DELETE /admin/deleteClient/{token}/{id}. Deletes a client and marks their rented cars available again; the cars stay in the catalogue. */
+	/**
+	 * DELETE /admin/deleteClient/{token}/{id}. Deletes a client and marks their rented cars available again; the cars
+	 * stay in the catalogue. Also ends the client's sessions, so their tokens stop working.
+	 */
 	@DeleteMapping("/deleteClient/{token}/{id}")
 	public ResponseEntity<?> removeClient(@PathVariable("token") String token, @PathVariable("id") int id) {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());
 			try {
-				return new ResponseEntity<>(adminServiceImpl.deleteClient(id), HttpStatus.OK);
+				Client deleted = adminServiceImpl.deleteClient(id);
+				if (ClientSession.removeClientSessions(tokensMap, id)) {
+					log.info("Sessions ended for deleted client id {}", id);
+				}
+				return new ResponseEntity<>(deleted, HttpStatus.OK);
 			} catch (Exception e) {
 				log.error("Failed to delete client by admin" + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed to delete client by admin", HttpStatus.BAD_REQUEST);

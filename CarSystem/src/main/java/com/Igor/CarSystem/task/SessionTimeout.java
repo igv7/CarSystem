@@ -38,11 +38,10 @@ public class SessionTimeout {
 	public void start() {
 		new Thread(new Runnable() {
 			
-			List<String> tokensToRemove = new ArrayList<String>();
-			
 			@Override
 			public void run() {
 				while(!stop) {
+					List<String> tokensToRemove = new ArrayList<String>();
 					for(Map.Entry<String, ClientSession> e:tokensMap.entrySet()) {
 						if (System.currentTimeMillis()-e.getValue().getLastAccessed()>TimeUnit.MINUTES.toMillis(timeoutMinutes)) {
 							tokensToRemove.add(e.getKey());

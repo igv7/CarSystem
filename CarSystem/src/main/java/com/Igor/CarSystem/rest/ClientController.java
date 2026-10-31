@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Igor.CarSystem.model.Client;
 import com.Igor.CarSystem.service.ClientServiceImpl;
 import com.Igor.CarSystem.task.ClientSession;
 
@@ -156,7 +157,10 @@ public class ClientController {
 		}
 	}
 
-	/** DELETE /client/deleteAccount/{token}. Deletes this client and marks their rented cars available again; the cars stay in the catalogue. */
+	/**
+	 * DELETE /client/deleteAccount/{token}. Deletes this client and marks their rented cars available again; the cars
+	 * stay in the catalogue. Also ends all of the client's sessions, so their tokens stop working.
+	 */
 	@DeleteMapping("/deleteAccount/{token}")
 	public ResponseEntity<?> deleteAccount(@PathVariable("token") String token) {
 		ClientSession clientSession = isActive(token);
@@ -164,7 +168,10 @@ public class ClientController {
 			clientSession.setLastAccessed(System.currentTimeMillis());
 			ClientServiceImpl clientServiceImpl = (ClientServiceImpl) clientSession.getFacade();
 			try {
-				return new ResponseEntity<>(clientServiceImpl.deleteAccount(), HttpStatus.OK);
+				Client deleted = clientServiceImpl.deleteAccount();
+				ClientSession.removeClientSessions(tokensMap, clientServiceImpl.getClientId());
+				log.info("Sessions ended for deleted client id {}", clientServiceImpl.getClientId());
+				return new ResponseEntity<>(deleted, HttpStatus.OK);
 			} catch (Exception e) {
 				log.error("Failed remove account." + ": {}", e.getMessage());
 				return new ResponseEntity<>("Failed remove account.", HttpStatus.BAD_REQUEST);
