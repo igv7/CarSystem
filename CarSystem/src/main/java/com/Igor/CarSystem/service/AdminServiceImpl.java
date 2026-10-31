@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.Igor.CarSystem.enums.CarColor;
@@ -31,10 +32,14 @@ public class AdminServiceImpl implements AdminService, Facade {
 	@Autowired
 	private CarRepository carRepository;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	// Client Operations
 	/**
 	 * Saves a new client. Field rules are checked by {@code @Valid} in the controller; any id or cars sent
-	 * in the body are ignored, so this always creates a new client with no rentals.
+	 * in the body are ignored, so this always creates a new client with no rentals. The password is stored as a
+	 * BCrypt hash.
 	 * @throws Exception if the name or clientID is already taken or a required field is missing
 	 */
 	@Override
@@ -42,15 +47,16 @@ public class AdminServiceImpl implements AdminService, Facade {
 		log.debug("************************StartCreateClient************************");
 		try {
 			if (clientRepository.existsByName(client.getName())) {
-				throw new Exception("This client name already exist in system, please try another name.");
+				throw new Exception("This client name already exists in system, please try another name.");
 			} else if (clientRepository.existsByClientID(client.getClientID())) {
-				throw new Exception("This identity number already exist in system: " + client.getClientID());
+				throw new Exception("This identity number already exists in system: " + client.getClientID());
 			} else if (client.getName() == null || client.getClientID() == null || client.getBirthday() == null
 					|| client.getPassword() == null || client.getPhoneNumber() == null || client.getEmail() == null) {
 				throw new Exception("Missing required fields (name, client ID, birthday, password, phone, email).");
 			} else {
 				client.setId(0);
 				client.setCars(new ArrayList<>());
+				client.setPassword(passwordEncoder.encode(client.getPassword()));
 				clientRepository.save(client);
 				log.info("Success on create client: " + client.getName() + " -> " + client);
 				log.debug("************************EndCreateClient************************");
@@ -63,7 +69,8 @@ public class AdminServiceImpl implements AdminService, Facade {
 	}
 
 	/**
-	 * Copies all details from {@code client} onto the stored client with the same ID.
+	 * Copies all details from {@code client} onto the stored client with the same ID. A non-empty password is
+	 * stored as a new BCrypt hash; an empty one keeps the current password.
 	 * @throws Exception if no client has that ID, or another client already has the new clientID
 	 */
 	@Override
@@ -76,12 +83,14 @@ public class AdminServiceImpl implements AdminService, Facade {
 			if (!optional.isPresent()) {
 				throw new Exception("Client doesn't exist");
 			} else if (sameClientID.isPresent() && sameClientID.get().getId() != client.getId()) {
-				throw new Exception("This identity number already exist in system: " + client.getClientID());
+				throw new Exception("This identity number already exists in system: " + client.getClientID());
 			} else {
 				temp = optional.get();
 				temp.setName(client.getName());
 				temp.setClientID(client.getClientID());
-				temp.setPassword(client.getPassword());
+				if (client.getPassword() != null && !client.getPassword().isEmpty()) {
+					temp.setPassword(passwordEncoder.encode(client.getPassword()));
+				}
 				temp.setBirthday(client.getBirthday());
 				temp.setPhoneNumber(client.getPhoneNumber());
 				temp.setEmail(client.getEmail());
@@ -213,7 +222,7 @@ public class AdminServiceImpl implements AdminService, Facade {
 		log.debug("************************StartCreateCar************************");
 		try {
 			if (carRepository.existsByNumber(car.getNumber())) {
-				throw new Exception("This car number already exist in system, please try another number.");
+				throw new Exception("This car number already exists in system, please try another number.");
 			} else if (car.getNumber() == null || car.getColor() == null || car.getType() == null
 					|| car.getPrice() == 0 || car.getImage() == null) {
 				throw new Exception("Missing required fields (number, color, type, price, image).");

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.Igor.CarSystem.model.Client;
@@ -22,6 +23,9 @@ public class SignUpServiceImpl implements SignUpService, Facade {
 	@Autowired
 	private ClientRepository clientRepository;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	/**
 	 * Highest starting balance a client may give themselves at sign-up (the administration's gift),
 	 * from {@code carsystem.signup.max-balance}.
@@ -32,7 +36,7 @@ public class SignUpServiceImpl implements SignUpService, Facade {
 	/**
 	 * Saves the client as a new account. Field rules are checked by {@code @Valid} in the controller; this
 	 * also caps the starting balance and ignores any id or cars sent in the body, so sign-up can't
-	 * overwrite an existing client or take over rented cars.
+	 * overwrite an existing client or take over rented cars. The password is stored as a BCrypt hash.
 	 * @return the saved client
 	 * @throws Exception if the name or clientID is already taken, the balance is above the sign-up limit, or saving fails
 	 */
@@ -43,12 +47,13 @@ public class SignUpServiceImpl implements SignUpService, Facade {
 			if (client.getBalance() > maxSignUpBalance) {
 				throw new Exception("The starting balance can be at most " + (int) maxSignUpBalance + ".");
 			} else if (clientRepository.existsByName(client.getName())) {
-				throw new Exception("This client name already exist in system, please try another name.");
+				throw new Exception("This client name already exists in system, please try another name.");
 			} else if (clientRepository.existsByClientID(client.getClientID())) {
-				throw new Exception("This identity number already exist in system: " + client.getClientID());
+				throw new Exception("This identity number already exists in system: " + client.getClientID());
 			} else {
 				client.setId(0);
 				client.setCars(new ArrayList<>());
+				client.setPassword(passwordEncoder.encode(client.getPassword()));
 				clientRepository.save(client);
 				log.info("Success on sign up: " + client.getName() + " -> " +client); 
 				log.debug("************************EndSignUp************************");

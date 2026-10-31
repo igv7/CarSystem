@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import javax.validation.Valid;
+import javax.validation.groups.Default;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -64,7 +66,7 @@ public class AdminController {
 	 * @return 200 with the client (not saved if required fields are missing), or 400 if the name is taken
 	 */
 	@PostMapping("/addClient/{token}")
-	public ResponseEntity<?> createClient(@Valid @RequestBody Client client, @PathVariable("token") String token) {
+	public ResponseEntity<?> createClient(@Validated({ Default.class, Client.OnCreate.class }) @RequestBody Client client, @PathVariable("token") String token) {
 		ClientSession clientSession = isActive(token);
 		if (clientSession != null) {
 			clientSession.setLastAccessed(System.currentTimeMillis());

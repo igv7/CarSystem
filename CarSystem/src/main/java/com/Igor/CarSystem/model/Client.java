@@ -23,6 +23,7 @@ import javax.validation.constraints.Size;
 
 import com.Igor.CarSystem.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,6 +41,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Client {
+
+	/** Validation group for rules that apply only when a client is created (sign-up and admin Add Client). */
+	public interface OnCreate {
+	}
 
 	/** Earliest accepted date of birth. */
 	private static final LocalDate MIN_BIRTHDAY = LocalDate.of(1900, 1, 1);
@@ -72,9 +77,14 @@ public class Client {
 	@Column(name = "DOB")
 	private String birthday;
 
-	/** Plain-text login password. Excluded from {@code toString()} so it never reaches the logs. */
+	/**
+	 * Login password. Arrives as typed text in request bodies and is stored as a BCrypt hash (the services
+	 * hash it before saving). Never written to responses, and excluded from {@code toString()} so it never
+	 * reaches the logs. Required when a client is created; on an update an empty value keeps the current one.
+	 */
 	@ToString.Exclude // keep passwords out of log output
-	@NotBlank(message = "is required")
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@NotBlank(groups = OnCreate.class, message = "is required")
 	@Size(min = 4, max = 100, message = "must be 4-100 characters")
 	@Column(name = "PASSWORD")
 	private String password;

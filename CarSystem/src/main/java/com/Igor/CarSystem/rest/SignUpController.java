@@ -5,9 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import javax.validation.Valid;
+import javax.validation.groups.Default;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,10 +30,11 @@ public class SignUpController {
 	
 	/**
 	 * POST /carSystem/signUp. Registers a new client from the JSON body.
-	 * @return 200 with the saved client, or 400 if the name is taken or saving fails
+	 * The field rules include those for new clients ({@link Client.OnCreate}), so a password is required.
+	 * @return 200 with the saved client, or 400 if the name or identity number is taken or saving fails
 	 */
 	@PostMapping("/signUp")
-	public ResponseEntity<?> signUp(@Valid @RequestBody Client client) {
+	public ResponseEntity<?> signUp(@Validated({ Default.class, Client.OnCreate.class }) @RequestBody Client client) {
 		try {
 			return new ResponseEntity<>(signUpServiceImpl.signUp(client), HttpStatus.OK);
 		} catch (Exception e) {

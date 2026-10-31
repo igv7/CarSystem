@@ -1,6 +1,7 @@
 package com.Igor.CarSystem.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -10,12 +11,14 @@ import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.groups.Default;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.Igor.CarSystem.enums.CarColor;
 import com.Igor.CarSystem.enums.CarType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** Checks the request validation rules on Car and Client without starting Spring or a database. */
 class ModelValidationTest {
@@ -47,6 +50,7 @@ class ModelValidationTest {
 	private static Client validClient() {
 		Client client = new Client();
 		client.setName("Igor");
+		client.setClientID("123456789");
 		client.setBirthday("1990-05-17");
 		client.setPassword("secret");
 		client.setPhoneNumber("050-1234567");
@@ -134,5 +138,23 @@ class ModelValidationTest {
 		Car car = validCar();
 		car.setNumber(" 123-45-678 ");
 		assertEquals("123-45-678", car.getNumber());
+	}
+
+	@Test
+	void passwordIsRequiredOnlyWhenCreating() {
+		Client client = validClient();
+		client.setPassword(null);
+		assertFalse(invalidFields(client).contains("password"));
+		Set<String> onCreate = validator.validate(client, Default.class, Client.OnCreate.class).stream()
+				.map(v -> v.getPropertyPath().toString()).collect(Collectors.toSet());
+		assertEquals(Set.of("password"), onCreate);
+	}
+
+	@Test
+	void passwordIsReadFromJsonButNeverWritten() throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+		Client client = mapper.readValue("{\"name\":\"Igor\",\"password\":\"secret\"}", Client.class);
+		assertEquals("secret", client.getPassword());
+		assertFalse(mapper.writeValueAsString(client).contains("password"));
 	}
 }

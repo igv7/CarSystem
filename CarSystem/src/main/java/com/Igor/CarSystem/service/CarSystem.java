@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.Igor.CarSystem.enums.ClientType;
@@ -36,11 +37,14 @@ public class CarSystem {
 	@Autowired
 	private ClientRepository clientRepository;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	/** Admin login name, from {@code carsystem.admin.username}. */
 	@Value("${carsystem.admin.username}")
 	private String adminUsername;
 
-	/** Admin login password, from {@code carsystem.admin.password}. */
+	/** BCrypt hash of the admin password, from {@code carsystem.admin.password}. */
 	@Value("${carsystem.admin.password}")
 	private String adminPassword;
 
@@ -72,14 +76,15 @@ public class CarSystem {
 	public Facade login(String userName, String password, ClientType type) throws Exception {
 		switch (type) {
 		case ADMIN:
-			if (userName.equals(adminUsername) && password.equals(adminPassword)) {
+			if (userName.equals(adminUsername) && passwordEncoder.matches(password, adminPassword)) {
 				log.info("Welcome Admin! You're logged into The Car System");
 				return adminServiceImpl;
 			}
 			break;
 		case CLIENT:
-			Client client = clientRepository.findByNameAndPassword(userName, password);
-			if (client != null) {
+			// Stored passwords are BCrypt hashes, so the typed one is checked with matches(), not looked up.
+			Client client = clientRepository.findByName(userName);
+			if (client != null && passwordEncoder.matches(password, client.getPassword())) {
 				ClientServiceImpl clientServiceImpl = context.getBean(ClientServiceImpl .class);
 				clientServiceImpl.setClientId(client.getId());
 				log.info("Welcome " +client.getName()+ "! You're logged into The Car System");
